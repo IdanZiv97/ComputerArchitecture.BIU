@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "ex1.h"
+#define WORD_SIZE 8;
 typedef unsigned char *byte_pointer;
 /**
  * We initilize an int with the value of 1.
@@ -21,6 +22,22 @@ int is_big_endian() {
         return 0;
     } else {
         return 1;
+    }   
+}
+
+unsigned long merge_bytes(unsigned long x, unsigned long int y) {
+    unsigned long word;
+    byte_pointer start = (byte_pointer) &word;
+    byte_pointer xPointer = (byte_pointer) &x;
+    byte_pointer yPointer = (byte_pointer) &y;
+    //The first 4 bytes are from y
+    //We are in little endian so we the LSB is the first one
+    int counter = 0;
+    for(;counter < 4; counter++) {
+        start[counter] = yPointer[counter];
     }
-    
+    for(;counter < 8; counter++) {
+        start[counter] = xPointer[counter];
+    }
+    return word;
 }
