@@ -13,12 +13,14 @@ typedef unsigned char *byte_pointer;
  **/
 
 int is_big_endian() {
-    int variable = 0x01234567;
-    //this allows us to jump in bytes
-    byte_pointer pointer = (byte_pointer) &variable;
-    int size = sizeof(int);
-    for (int i = 0; i < size; i++)
-        printf(" %.2x", pointer[i]);
-    printf("\n");
-    return 0;
+    int flag = 1;
+    byte_pointer pointer = (byte_pointer) &flag;
+    //the first byte will be 0x01 if it is Little Endian
+    if (*pointer)
+    {
+        return 0;
+    } else {
+        return 1;
+    }
+    
 }
