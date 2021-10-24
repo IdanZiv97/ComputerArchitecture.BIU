@@ -81,9 +81,13 @@ unsigned long put_byte(unsigned long x, unsigned char b, int i) {
 }
 
 unsigned long put_byte_aidLittle(unsigned long x, unsigned char b, int i) {
-    int shiftIndex = i * BYTE_SIZE;
-    unsigned long mask = 0xff << shiftIndex;
-    x = x & ~mask;
-    unsigned long newByte = b << shiftIndex;
-    return (x | newByte);
+    //lets try to to 1 to 0 were we want to
+    unsigned long mask = 0xFF;
+    for (int b = 0; b < 8; b++) {
+        int shift = (7 - b) * BYTE_SIZE;
+        unsigned long test = mask << shift;
+        printf("Shift is: %d\n", shift);
+        printf("The mask is 0x%lx\n", test);
+    }
+    return 1;
 }
