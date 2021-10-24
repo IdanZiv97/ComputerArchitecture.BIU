@@ -2,6 +2,8 @@
 #include "ex1.h"
 #define WORD_SIZE 8;
 typedef unsigned char *byte_pointer;
+unsigned long merge_bytes_bigAid(unsigned long x, unsigned long int y);
+unsigned long merge_bytes_littleAid(unsigned long x, unsigned long int y);
 /**
  * We initilize an int with the value of 1.
  * We know that it is stored in the memory in a 4-byte adress.
@@ -27,17 +29,35 @@ int is_big_endian() {
 
 unsigned long merge_bytes(unsigned long x, unsigned long int y) {
     unsigned long word;
-    byte_pointer start = (byte_pointer) &word;
-    byte_pointer xPointer = (byte_pointer) &x;
-    byte_pointer yPointer = (byte_pointer) &y;
-    //The first 4 bytes are from y
-    //We are in little endian so we the LSB is the first one
-    int counter = 0;
-    for(;counter < 4; counter++) {
-        start[counter] = yPointer[counter];
-    }
-    for(;counter < 8; counter++) {
-        start[counter] = xPointer[counter];
+    if (is_big_endian()) {
+        word = merge_bytes_bigAid(x, y);
+    } else {
+        word = merge_bytes_littleAid(x, y);
     }
     return word;
+}
+
+/**
+ * This function will be invoked when we 
+ * */
+
+unsigned long merge_bytes_bigAid(unsigned long x, unsigned long int y) {
+    return 1;
+}
+/**
+ * We will use bit masking.
+ * For the first half we will create a "mask" from the word y.
+ * For the second half we will create a "mask" from the word x.
+ * We know that the 1 and 0 in both words are opposing so we can create a merged word using
+ * the OR ('|') bit operator.
+ **/
+unsigned long merge_bytes_littleAid(unsigned long x, unsigned long int y) {
+    //We need the first 4-bytes
+    unsigned long maskY = 0xffffffff;
+    //we need the last 4-bytes
+    unsigned long maskX = 0xffffffff00000000;
+    //create the new masked y word
+    y = y & maskY;
+    x = x & maskX;
+    return (x | y);
 }
