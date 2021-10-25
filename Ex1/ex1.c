@@ -33,7 +33,7 @@ int is_big_endian() {
 unsigned long merge_bytes(unsigned long x, unsigned long int y) {
     unsigned long word;
     if (is_big_endian()) {
-        word = merge_bytes_bigAid(x, y);
+        word = merge_bytes_littleAid(x, y);
     } else {
         word = merge_bytes_littleAid(x, y);
     }
@@ -74,7 +74,7 @@ unsigned long merge_bytes_littleAid(unsigned long x, unsigned long int y) {
  **/
 unsigned long put_byte(unsigned long x, unsigned char b, int i) {
     if (is_big_endian()) {
-        return 0;
+        return put_byte_aidLittle(x, b, i);
     } else {
        return put_byte_aidLittle(x, b, i);
     }
@@ -83,14 +83,14 @@ unsigned long put_byte(unsigned long x, unsigned char b, int i) {
 unsigned long put_byte_aidLittle(unsigned long x, unsigned char b, int i) {
     //lets try to to 1 to 0 were we want to
     unsigned long mask = 0xFF;
-    printf("Char is: %.2hhx\n", b);
+    //printf("Char is: %.2hhx\n", b);
     int shiftIndex = (7 - i) * BYTE_SIZE;
     mask = mask << shiftIndex;
-    printf("This is mask: %.2lx\n", mask);
+    //printf("This is mask: %.2lx\n", mask);
     unsigned long replacement = ((unsigned long) b) << shiftIndex;
-    printf("Replacement is:%.2lx\n", replacement);
+    //printf("Replacement is:%.2lx\n", replacement);
     unsigned long change = mask & replacement;
-    printf("Change is: 0x%lx\n", change);
-    printf("0x%lx\n", (x & ~mask) | change);
-    return 1;
+    //printf("Change is: 0x%lx\n", change);
+    //printf("0x%lx\n", (x & ~mask) | change);
+    return ((x & ~mask) | change);
 }
