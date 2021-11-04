@@ -11,6 +11,16 @@ typedef enum {
 //aid functions
 int isZero(magnitude m);
 
+/**
+ * In order to determine greater relation between two magnitudes we need to find the first bit that is different from the left.
+ * In positive numbers, if a is greater than b this bit will be 1
+ * In negative numbers, if a is greater than b this bit will be 0
+ * The function handles cases such as:
+ *  1. equal numbers
+ *  2. postive against negative
+ *  3. the two representations of the nubmer 0
+ * at the end if the number is in fact greater the function will return 1, o.w 0.
+ **/
 int greater(magnitude a, magnitude b) {
     int isGreater = 1;
     //check if equal
@@ -63,12 +73,8 @@ int greater(magnitude a, magnitude b) {
     return 10;
 }
 
-
-
-
-
 /**
- * isEqual fucntion comapres the bits of the magnitudes to check if there is at least one bit who is diferent.
+ * equal fucntion comapres the bits of the magnitudes to check if there is at least one bit who is diferent.
  * The functions also takes into consideration the two different representation of zero.
  * The ^ operator in case of equal mangitudes will result in 0, otherwise at least one pair of bits are diferent which will result
  * in the result proper bit to be set to 1, which will create a value diferent from 0.
@@ -108,14 +114,4 @@ int isZero(magnitude m) {
     } else {
        return isZero;
     }
-}
-
-int main() {
-    //test for greater - zero;
-    assert(greater(0x80000003, 0x80000004));
-    assert(!greater(0x80000004, 0x80000003));
-    assert(!greater(0x80000fff, 0x80000fff));
-    assert(!greater(0x8000000f, 0x8000000e));
-    assert(greater(0x8000000e, 0x8000000f));
-    return 1;
 }
