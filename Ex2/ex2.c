@@ -4,8 +4,54 @@
 #define MSB_MASK 0x80000000
 #define ZERO_SIGNED MSB_MASK
 #define BYTE 8;
-
+typedef enum {
+    false = 0,
+    true = 1,
+}bool;
+//aid functions
 int isZero(magnitude m);
+
+int greater(magnitude a, magnitude b) {
+    int isGreater = 1;
+    //check if equal
+    if (equal(a, b)) {
+        return isGreater = 0;
+    }
+    //flags
+    bool aPositive = (a & MSB_MASK) ? false : true;
+    bool bPositive = (b & MSB_MASK) ? false : true; 
+    //check if a is positive and b is not, a positive and b is zero
+    if ((aPositive && !bPositive) || (!isZero(a) && aPositive && isZero(b))) {
+        return isGreater;
+    }
+    //check if a is positive and b is zero
+    if (bPositive && (!aPositive && !isZero(b))) {
+        return isGreater = 0;
+    }
+    //if both positive check for the first most left bit that is different
+    if (aPositive && bPositive) {
+        int mask = 0x40000000;
+        while (mask) {
+            if((mask & a) && !(mask & b)) {
+                isGreater = 1;
+                break;
+            }
+            if(!(mask & a) && (mask & b)) {
+                isGreater = 0;
+                break;
+            }
+            mask = mask >> 1;
+        }
+        return isGreater;
+    }
+    printf("error");
+    return 10;
+}
+
+
+
+
+
 /**
  * isEqual fucntion comapres the bits of the magnitudes to check if there is at least one bit who is diferent.
  * The functions also takes into consideration the two different representation of zero.
@@ -30,7 +76,12 @@ int equal(magnitude a, magnitude b) {
     }
 }
 
-//need to fix this bug
+/**
+ * This aid function checks if the mangintude is actually the number 0, which is represented the same in 
+ * sign-magnitude and two's compliment.
+ * The other check is for its second representation in sing-magnitude, which is for -0.
+ * The check uses the same logic to check equal magnitudes used in equal function.
+ * */
 int isZero(magnitude m) {
     //indicates m is a zero
     int isZero = 1;
@@ -42,4 +93,15 @@ int isZero(magnitude m) {
     } else {
        return isZero;
     }
+}
+
+int main() {
+    //test for greater - positive;
+    assert(greater(0x4fffffff, 0x4));
+    assert(!greater(0x4, 0x4fffffff));
+    assert(!greater(0b101101, 0b101110));
+    assert(greater(0b101110,0b101101));
+    assert(greater(0b111111000100101,0b11));
+    assert(!greater(0b11, 0b111111000100101));
+    return 1;
 }
