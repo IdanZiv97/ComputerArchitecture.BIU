@@ -1,7 +1,7 @@
 #ifndef UNTITLED2_EX2_H
 #define UNTITLED2_EX2_H
 
-typedef magnitude;
+typedef int magnitude;
 
 
 magnitude add(magnitude a, magnitude b); // a + b
