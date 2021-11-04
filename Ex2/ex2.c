@@ -28,9 +28,9 @@ int greater(magnitude a, magnitude b) {
     if (bPositive && (!aPositive && !isZero(b))) {
         return isGreater = 0;
     }
+    int mask = 0x40000000;
     //if both positive check for the first most left bit that is different
     if (aPositive && bPositive) {
-        int mask = 0x40000000;
         while (mask) {
             if((mask & a) && !(mask & b)) {
                 isGreater = 1;
@@ -38,6 +38,21 @@ int greater(magnitude a, magnitude b) {
             }
             if(!(mask & a) && (mask & b)) {
                 isGreater = 0;
+                break;
+            }
+            mask = mask >> 1;
+        }
+        return isGreater;
+    }
+    //for negative numbers - we check from the 31st for the lesser of the two
+    if (!aPositive && !bPositive) {
+        while (mask) {
+            if((mask & a) && !(mask & b)) {
+                isGreater = 0;
+                break;
+            }
+            if(!(mask & a) && (mask & b)) {
+                isGreater = 1;
                 break;
             }
             mask = mask >> 1;
@@ -96,12 +111,11 @@ int isZero(magnitude m) {
 }
 
 int main() {
-    //test for greater - positive;
-    assert(greater(0x4fffffff, 0x4));
-    assert(!greater(0x4, 0x4fffffff));
-    assert(!greater(0b101101, 0b101110));
-    assert(greater(0b101110,0b101101));
-    assert(greater(0b111111000100101,0b11));
-    assert(!greater(0b11, 0b111111000100101));
+    //test for greater - zero;
+    assert(greater(0x80000003, 0x80000004));
+    assert(!greater(0x80000004, 0x80000003));
+    assert(!greater(0x80000fff, 0x80000fff));
+    assert(!greater(0x8000000f, 0x8000000e));
+    assert(greater(0x8000000e, 0x8000000f));
     return 1;
 }
