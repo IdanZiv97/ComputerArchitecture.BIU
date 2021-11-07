@@ -25,6 +25,7 @@ int printMagnitude(magnitude m) {
 
 int main()
 {
+    //tests for printMagnitude
     magnitude m1 = 0b0100; //=4
     magnitude m2 = 0x80000004; //-4
     magnitude m3 = 0x3BEB8;//=245432
