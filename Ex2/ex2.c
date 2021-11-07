@@ -11,16 +11,36 @@ typedef enum {
 //aid functions
 int isZero(magnitude m);
 
+magnitude add(magnitude a, magnitude b) {
+    //check if one of them is 0
+    if(isZero(a)) {
+        return b;
+    } else if(isZero(b)) {
+        return a;
+    }
+    //if two positives
+        //check for overflow
+    //if two negatives
+        //check for underflow
+    //if one positive and one nega
+        //if equal - return 0
+        
+
+}
+
 /**
- * In order to determine greater relation between two magnitudes we need to find the first bit that is different from the left.
+ * @brief In order to determine greater relation between two magnitudes we need to find the first bit that
+ * is different from the left.
  * In positive numbers, if a is greater than b this bit will be 1
  * In negative numbers, if a is greater than b this bit will be 0
  * The function handles cases such as:
  *  1. equal numbers
  *  2. postive against negative
  *  3. the two representations of the nubmer 0
- * at the end if the number is in fact greater the function will return 1, o.w 0.
- **/
+ * @param a 
+ * @param b 
+ * @return int 
+ */
 int greater(magnitude a, magnitude b) {
     int isGreater = 1;
     //check if equal
@@ -74,11 +94,15 @@ int greater(magnitude a, magnitude b) {
 }
 
 /**
- * equal fucntion comapres the bits of the magnitudes to check if there is at least one bit who is diferent.
- * The functions also takes into consideration the two different representation of zero.
- * The ^ operator in case of equal mangitudes will result in 0, otherwise at least one pair of bits are diferent which will result
- * in the result proper bit to be set to 1, which will create a value diferent from 0.
- **/
+ * @brief equal fucntion comapres the bits of the magnitudes to check if there is at least 
+ * one bit who is diferent. The functions also takes into consideration the two different
+ * representation of zero. The ^ operator in case of equal mangitudes will result in 0, 
+ * otherwise at least one pair of bits are diferent which will resultin the result proper
+ * bit to be set to 1, which will create a value diferent from 0.
+ * @param a an integer in sign-magnitude representation
+ * @param b an integer in sign-magnitude representation
+ * @return 1 - if the numbers are equal, 0 otherwise
+ */
 int equal(magnitude a, magnitude b) {
     int isEqual = 1; //indicates true
     //check for both representation of zero
@@ -98,11 +122,13 @@ int equal(magnitude a, magnitude b) {
 }
 
 /**
- * This aid function checks if the mangintude is actually the number 0, which is represented the same in 
- * sign-magnitude and two's compliment.
+ * @brief This aid function checks if the mangintude is actually the number 0, which is
+ * represented the same in sign-magnitude and two's compliment.
  * The other check is for its second representation in sing-magnitude, which is for -0.
  * The check uses the same logic to check equal magnitudes used in equal function.
- * */
+ * @param m an integer in sign-magnitude representation
+ * @return 1 if the numbers is a zero, 0 otherwise 
+ */
 int isZero(magnitude m) {
     //indicates m is a zero
     int isZero = 1;
