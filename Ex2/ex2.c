@@ -11,6 +11,7 @@ typedef enum {
 }bool;
 //aid functions
 bool isZero(magnitude m);
+magnitude turnToPositive(magnitude m);
 
 int add(magnitude a, magnitude b) {
     //check for sign
@@ -26,7 +27,10 @@ int add(magnitude a, magnitude b) {
     if (aPositive && bPositive) {
         return a + b;
     }
-    //if both negative - is adding one positive and one negative
+    // if the sign is different - it like subtracting to positive integers
+    if (aPositive && !bPositive) {
+        //return sub(a, turnToPositive(b));
+    }
     //if one is negative
         //it is like subtracting the two positive integers
     //check for overflow/underflow
@@ -146,4 +150,16 @@ bool isZero(magnitude m) {
     } else {
        return isZero;
     }
+}
+/**
+ * @brief this function turns the absolute value of a sign-magnitude, hence making it positive.
+ * We will do this by making sure we turn the MSB to 0, while not making any changes to the rest
+ * of the bits 
+ * @param m a sign-magnitude represented integer
+ * @return m's absolute value
+ */
+magnitude turnToPositive(magnitude m) {
+    unsigned mask = 0x7fffffff;
+    magnitude abs_m = m & mask;
+    return abs_m;
 }
