@@ -24,14 +24,9 @@ int add(magnitude a, magnitude b) {
     }
     //if both positive
     if (aPositive && bPositive) {
-        while(b != 0) {
-            unsigned int carry = a & b;
-            a = a ^ b; //stores the sum
-            b = carry << 1;
-        }
-        return a;
+        return a + b;
     }
-    //if both positive
+    //if both negative - is adding one positive and one negative
     //if one is negative
         //it is like subtracting the two positive integers
     //check for overflow/underflow
