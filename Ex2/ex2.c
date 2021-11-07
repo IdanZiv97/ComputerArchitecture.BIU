@@ -13,7 +13,14 @@ typedef enum {
 bool isZero(magnitude m);
 magnitude turnToPositive(magnitude m);
 
-int add(magnitude a, magnitude b) {
+/**
+ * @brief 
+ * 
+ * @param a 
+ * @param b 
+ * @return magnitude 
+ */
+magnitude add(magnitude a, magnitude b) {
     //check for sign
     bool aPositive = (a & MSB_MASK) == 0 ? true : false;
     bool bPositive = (b & MSB_MASK) == 0 ? true : false;
@@ -29,14 +36,13 @@ int add(magnitude a, magnitude b) {
     }
     // if the sign is different - it like subtracting to positive integers
     if (aPositive && !bPositive) {
-        //return sub(a, turnToPositive(b));
+        return sub(a, turnToPositive(b));
     }
-    //if one is negative
-        //it is like subtracting the two positive integers
     //check for overflow/underflow
     printf("error");
     return 0;
 }
+
 
 /**
  * @brief In order to determine greater relation between two magnitudes we need to find the first bit that
