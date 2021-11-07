@@ -3,6 +3,7 @@
 #include "ex2.h"
 #define MSB_MASK 0x80000000
 #define ZERO_SIGNED MSB_MASK
+#define ABS_MASK 0x7fffffff
 #define BYTE 8;
 typedef enum {
     false = 0,
@@ -12,13 +13,30 @@ typedef enum {
 bool isZero(magnitude m);
 
 int add(magnitude a, magnitude b) {
+    //check for sign
+    bool aPositive = (a & MSB_MASK) == 0 ? true : false;
+    bool bPositive = (b & MSB_MASK) == 0 ? true : false;
     //if one of the numbers is zero - return the other one
-    if (isZero)
+    if (isZero(a)) {
+        return b;
+    } else if (isZero(b)) {
+        return a;
+    }
     //if both positive
+    if (aPositive && bPositive) {
+        while(b != 0) {
+            unsigned int carry = a & b;
+            a = a ^ b; //stores the sum
+            b = carry << 1;
+        }
+        return a;
+    }
     //if both positive
     //if one is negative
         //it is like subtracting the two positive integers
     //check for overflow/underflow
+    printf("error");
+    return 0;
 }
 
 /**
