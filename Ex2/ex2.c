@@ -9,23 +9,16 @@ typedef enum {
     true = 1,
 }bool;
 //aid functions
-int isZero(magnitude m);
+bool isZero(magnitude m);
 
-magnitude add(magnitude a, magnitude b) {
-    //check if one of them is 0
-    if(isZero(a)) {
-        return b;
-    } else if(isZero(b)) {
-        return a;
-    }
-    //if two positives
-        //check for overflow
-    //if two negatives
-        //check for underflow
-    //if one positive and one nega
-        //if equal - return 0
-        
-
+int add(magnitude a, magnitude b) {
+    //if one of the numbers is zero - return the other one
+    if (isZero)
+    //if both positive
+    //if both positive
+    //if one is negative
+        //it is like subtracting the two positive integers
+    //check for overflow/underflow
 }
 
 /**
@@ -127,16 +120,16 @@ int equal(magnitude a, magnitude b) {
  * The other check is for its second representation in sing-magnitude, which is for -0.
  * The check uses the same logic to check equal magnitudes used in equal function.
  * @param m an integer in sign-magnitude representation
- * @return 1 if the numbers is a zero, 0 otherwise 
+ * @return a boolean: true if the number is a zero, false otherwise 
  */
-int isZero(magnitude m) {
+bool isZero(magnitude m) {
     //indicates m is a zero
-    int isZero = 1;
+    bool isZero = true;
     //If it is actually 0.
     if (m == 0) {
         return isZero;
     } else if (m ^ ZERO_SIGNED) {
-        return isZero = 0;
+        return isZero = false;
     } else {
        return isZero;
     }
