@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <assert.h>
 #include "ex2.h"
+#include "test.c"
 #define MSB_MASK 0x80000000
-#define ZERO_SIGNED MSB_MASK
+#define ZERO_SIGNED MSB_MASK 
 #define ABS_MASK 0x7fffffff
 #define BYTE 8;
 typedef enum {
@@ -50,6 +51,7 @@ magnitude sub(magnitude a, magnitude b) {
     bool bPositive = (b & MSB_MASK) == 0 ? true : false;
     //if one of the is zero
     if (isZero(a)) {
+        b = (bPositive == false) ? (b & ABS_MASK) : (b | (MSB_MASK));
         return b;
     } else if (isZero(b)) {
         return a;
