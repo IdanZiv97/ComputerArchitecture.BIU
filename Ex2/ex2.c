@@ -40,6 +40,10 @@ magnitude add(magnitude a, magnitude b) {
     if (aPositive && !bPositive) {
         return sub(a, turnToPositive(b));
     }
+    //-a+b = b-a
+    if (!aPositive && bPositive) {
+        return sub(b,turnToPositive(a));
+    }
     //check for overflow/underflow
     printf("error");
     return 0;
@@ -203,6 +207,6 @@ magnitude turnToPositive(magnitude m) {
 }
 
 int main() {
-    test_subAposBneg();
+    test_addDifferentSigns();
     return 0;
 }
