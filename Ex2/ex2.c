@@ -51,7 +51,7 @@ magnitude sub(magnitude a, magnitude b) {
     bool bPositive = (b & MSB_MASK) == 0 ? true : false;
     //if one of the is zero
     if (isZero(a)) {
-        b = (bPositive == false) ? turnToPositive(b) : (b | (MSB_MASK));
+        b = (bPositive == false) ? turnToPositive(b) : (-1 * b);
         return b;
     } else if (isZero(b)) {
         return a;
@@ -60,11 +60,18 @@ magnitude sub(magnitude a, magnitude b) {
     if (aPositive && bPositive) {
         return a - b;
     }
-    //if to negative numbers
+    //if to negative numbers - b becomes positive and it is like creating b-|a|
+    //-a-(-b)=-a+b=b-a=b-|a|
     if (!aPositive && !bPositive) {
-        
+        b = turnToPositive(b);
+        a = turnToPositive(a);
+        return sub(b, a);
     }
     //if diffrenet sign
+    if (aPositive && !bPositive) {
+        b = turnToPositive(b);
+        return add(a, b);
+    }
     printf("error");
     return 0;
 }
@@ -193,4 +200,9 @@ magnitude turnToPositive(magnitude m) {
     unsigned mask = 0x7fffffff;
     magnitude abs_m = m & mask;
     return abs_m;
+}
+
+int main() {
+    test_subAposBneg();
+    return 0;
 }
