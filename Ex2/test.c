@@ -159,6 +159,49 @@ void test_subPositiveIntegers() {
     assert(printMagnitude(test10) == 0x80000036 ? printf("Passed test10\n") : printf("test8: expected %x got %x\n", 0x80000036, printMagnitude(test8)));
     printf("\ntest10: %x == %x != %x", 0x80000036, printMagnitude(test10), printMagnitude(test5));
 }
+void test_addDifferentSigns() {
+    printf("Test for add when the nubmers are in a different sign\n\n");
+
+    magnitude a1 = 32;
+    magnitude a2 = 0x8000002a;//-42
+    magnitude a3 = 0x800017f3;//-6131
+    magnitude a4 = 121;
+    magnitude a5 = 2131;
+    magnitude a6 = 0x800007e5;//-2021
+
+    magnitude b1 = 12;
+    magnitude b2 = 0x800006ca;//-1738
+    magnitude b3 = 5782;
+    magnitude b4 = 9999;
+    magnitude b5 = 0x80004c18;//-19480
+    magnitude b6 = 0x8000000d;//-13
+
+    magnitude test1 = add(a1, b2);//-1706 -> 0x800006aa
+    magnitude test2 = add(a4, b5);//-19359 -> 0x80004b9f
+    magnitude test3 = add(a5, b6);//2118
+    magnitude test4 = add(a1, b6);//19
+    magnitude test5 = add(a4, b2);//-1617 -> 0x80000651
+    magnitude test6 = add(a5, b5);//-17349 -> 0x800043c5
+    magnitude test7 = add(a2, b1);//-30 -> 0x8000001e
+    magnitude test8 = add(a6, b3);//3761
+    magnitude test9 = add(a3, b4);//3868
+    magnitude test10 = add(a6, b1);//-2009 -> 0x800007d9
+    magnitude test11 = add(a3, b3);//-349 -> 0x8000015d
+    magnitude test12 = add(a2, b4);//9957
+
+    assert(printMagnitude(test1) == 0x800006aa ? printf("Passed test1\n") : printf("test1: expected %x got %x\n", 0x800006aa, printMagnitude(test1)));
+    assert(printMagnitude(test2) == 0x80004b9f ? printf("Passed test2\n") : printf("test2: expected %x got %x\n", 0x80004b9f, printMagnitude(test2)));
+    assert(printMagnitude(test3) == 2118 ? printf("Passed test3\n") : printf("test3: expected %d got %d\n", 2118, printMagnitude(test3)));
+    assert(printMagnitude(test4) == 19 ? printf("Passed test4\n") : printf("test4: expected %d got %d\n", 19, printMagnitude(test4)));
+    assert(printMagnitude(test5) == 0x80000651 ? printf("Passed test5\n") : printf("test5: expected %x got %x\n", 0x80000651, printMagnitude(test5)));
+    assert(printMagnitude(test6) == 0x800043c5 ? printf("Passed test6\n") : printf("test6: expected %x got %x\n", 0x800043c5, printMagnitude(test6)));
+    assert(printMagnitude(test7) == 0x8000001e ? printf("Passed test7\n") : printf("test7: expected %x got %x\n", 0x8000001e, printMagnitude(test7)));
+    assert(printMagnitude(test8) == 3761 ? printf("Passed test8\n") : printf("test8: expected %d got %d\n", 3761, printMagnitude(test8)));
+    assert(printMagnitude(test9) == 3868 ? printf("Passed test9\n") : printf("test9: expected %d got %d\n", 3868, printMagnitude(test9)));
+    assert(printMagnitude(test10) == 0x800007d9 ? printf("Passed test10\n") : printf("test10: expected %x got %x\n", 0x800007d9, printMagnitude(test10)));
+    assert(printMagnitude(test11) == 0x8000015d ? printf("Passed test11\n") : printf("test11: expected %x got %x\n", 0x8000015d, printMagnitude(test11)));
+    assert(printMagnitude(test12) == 9957 ? printf("Passed test12\n") : printf("test12: expected %d got %d\n", 9957, printMagnitude(test12)));
+}
 void test_addPositiveIntegers() {
     printf("Tests for addPositiveIntegers\n");
     magnitude m1 = 0b0100; //=4
