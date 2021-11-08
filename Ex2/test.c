@@ -5,7 +5,6 @@
 #define ABS_MASK 0x7fffffff
 int printMagnitude(magnitude m);
 magnitude turnToPositive(magnitude m);
-magnitude sub(magnitude a, magnitude b);
 /**
  * @brief The function converts the prints the value of the magnitude, in a way 
  * a human can understand. Firsly we determine the sign by checking the MSB of the number.
@@ -21,6 +20,36 @@ int printMagnitude(magnitude m) {
     //calculate the absolute value of the magnitude - with the mask
     unsigned int absValue = m & ABS_MASK;
     return (int) absValue * sign;
+}
+void test_subAisZero() {
+    magnitude a = 0;
+    magnitude m1 = 0x80000036;//-54
+    magnitude m2 = 0x8000aa04;//-43524
+    magnitude m3 = 0xd;//13
+    magnitude m4 = 0x1861;//6241
+    magnitude m5 = 0x8000000e;//-14;
+    magnitude m6 = 0x800009b0;//-2480
+    magnitude m7 = 0xf;//15
+    magnitude m8 = 0x2a;//42
+
+    magnitude test1 = sub(a, m1);//54
+    magnitude test2 = sub(a, m2);//43254
+    magnitude test3 = sub(a, m3);//-13
+    magnitude test4 = sub(a, m4);//-6241
+    magnitude test5 = sub(a, m5);//14
+    magnitude test6 = sub(a, m6);//2480
+    magnitude test7 = sub(a, m7);//-15
+    magnitude test8 = sub(a, m8);//-42
+
+    assert(printMagnitude(test1) == 54 ? printf("Passed test1\n") : printf("test1: expected 54 got %d\n", printMagnitude(test1)));
+    assert(printMagnitude(test2) == 43524 ? printf("Passed test2\n") : printf("test2: expected 43524 got %d\n", printMagnitude(test2)));
+    assert(printMagnitude(test3) == -13 ? printf("Passed test3\n") : printf("test3: expected -13 got %d\n", printMagnitude(test3)));
+    assert(printMagnitude(test4) == -6241 ? printf("Passed test4\n") : printf("test4: expected -6241 got %d\n", printMagnitude(test4)));
+    assert(printMagnitude(test5) == 14 ? printf("Passed test5\n") : printf("test5: expected 14 got %d\n", printMagnitude(test5)));
+    assert(printMagnitude(test6) == 2480 ? printf("Passed test6\n") : printf("test6: expected 2480 got %d\n", printMagnitude(test6)));
+    assert(printMagnitude(test7) == -15 ? printf("Passed test7\n") : printf("test7: expected -16 got %d\n", printMagnitude(test7)));
+    assert(printMagnitude(test8) == -42 ? printf("Passed test8\n") : printf("test8: expected -42 got %d\n", printMagnitude(test8)));
+
 }
 void test_subPositiveIntegers() {
     printf("Tests for addPositiveIntegers\n");
@@ -98,10 +127,4 @@ void test_turnToPositive() {
     assert(printMagnitude(test5) == 34235798 ? printf("Passed test5\n") : printf("test5: expected 34235798 got %d\n", printMagnitude(test5)));
     assert(printMagnitude(test6) == 1 ? printf("Passed test6\n") : printf("test6: expected 1 got %d\n", printMagnitude(test6)));
     assert(printMagnitude(test7) == 2147483647 ? printf("Passed test7\n") : printf("test7: expected 2147483647 got %d\n", printMagnitude(test7)));
-}
-int main()
-{
-    printf("%d\n", add(-6, 1));
-    test_subPositiveIntegers();
-    return 0;
 }
