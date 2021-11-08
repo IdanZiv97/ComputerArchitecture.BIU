@@ -51,7 +51,7 @@ magnitude sub(magnitude a, magnitude b) {
     bool bPositive = (b & MSB_MASK) == 0 ? true : false;
     //if one of the is zero
     if (isZero(a)) {
-        b = (bPositive == false) ? (b & ABS_MASK) : (b | (MSB_MASK));
+        b = (bPositive == false) ? turnToPositive(b) : (b | (MSB_MASK));
         return b;
     } else if (isZero(b)) {
         return a;
@@ -61,6 +61,9 @@ magnitude sub(magnitude a, magnitude b) {
         return a - b;
     }
     //if to negative numbers
+    if (!aPositive && !bPositive) {
+        
+    }
     //if diffrenet sign
     printf("error");
     return 0;
