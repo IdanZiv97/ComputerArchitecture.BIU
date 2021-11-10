@@ -5,6 +5,7 @@
 #define ABS_MASK 0x7fffffff
 int printMagnitude(magnitude m);
 magnitude turnToPositive(magnitude m);
+magnitude turnToNegative(magnitude m);
 /**
  * @brief The function converts the prints the value of the magnitude, in a way 
  * a human can understand. Firsly we determine the sign by checking the MSB of the number.
@@ -226,6 +227,31 @@ void test_addPositiveIntegers() {
     assert(printMagnitude(test5) == 0 ? printf("Passed test5\n") : printf("test5: expected 0 got %d\n", test5));
     assert(printMagnitude(test6) == 214 ? printf("Passed test6\n") : printf("test6: expected 214 got %d\n", test6));
     assert(printMagnitude(test7) == 29 ? printf("Passed test7\n") : printf("test7: expected 219 got %d\n", test7));
+}
+void test_turnToNegative() {
+    printf("Test for turnToNegative aid function\n\n");
+
+    magnitude m1 = 353;
+    magnitude m2 = 4412;
+    magnitude m3 = 1;
+    magnitude m4 = 0xfff;//4095
+    magnitude m5 = 0x7fffffff;//2147483647
+    magnitude m6 = 0x800000ff;//-255
+
+    magnitude test1 = turnToNegative(m1);
+    magnitude test2 = turnToNegative(m2);
+    magnitude test3 = turnToNegative(m3);
+    magnitude test4 = turnToNegative(m4);
+    magnitude test5 = turnToNegative(m5);
+    //want to check if it does not effect already neg numbers
+    magnitude test6 = turnToNegative(m6);
+
+    assert(printMagnitude(test1) == 0x80000161 ? printf("Passed test1\n") : printf("test1: expected %x got %x\n", 0x80000161, printMagnitude(test1)));
+    assert(printMagnitude(test2) == 0x8000113c ? printf("Passed test2\n") : printf("test2: expected %x got %x\n", 0x8000113c, printMagnitude(test2)));
+    assert(printMagnitude(test3) == 0x80000001 ? printf("Passed test3\n") : printf("test3: expected %x got %x\n", 0x80000001, printMagnitude(test3)));
+    assert(printMagnitude(test4) == 0x80000fff ? printf("Passed test4\n") : printf("test4: expected %x got %x\n", 0x80000fff, printMagnitude(test4)));
+    assert(printMagnitude(test5) == 0x8fffffff ? printf("Passed test5\n") : printf("test5: expected %x got %x\n", 0x8fffffff, printMagnitude(test5)));
+    assert(printMagnitude(test6) == 0x800000ff ? printf("Passed test6\n") : printf("test4: expected %x got %x\n", 0x800000ff, printMagnitude(test6)));
 }
 void test_turnToPositive() {
     printf("Tests for turnToPositive\n");
