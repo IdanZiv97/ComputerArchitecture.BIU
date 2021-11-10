@@ -13,6 +13,7 @@ typedef enum {
 //aid functions
 bool isZero(magnitude m);
 magnitude turnToPositive(magnitude m);
+magnitude turnToNegative(magnitude m);
 int printMagnitude(magnitude m);
 
 /**
@@ -75,6 +76,11 @@ magnitude sub(magnitude a, magnitude b) {
     if (aPositive && !bPositive) {
         b = turnToPositive(b);
         return add(a, b);
+    }
+    //-a-b = -(a+b)
+    if (!aPositive && bPositive) {
+        magnitude result = add(turnToPositive(a), turnToPositive(b));
+        return turnToNegative(result);
     }
     printf("error");
     return 0;
@@ -206,7 +212,19 @@ magnitude turnToPositive(magnitude m) {
     return abs_m;
 }
 
+/**
+ * @brief this function turn the negation of a number in a sign-magnitude
+ * It does it by changing the MSB to 1;
+ * @param m a magnitude which required to become a negative
+ * @return a negative magnitude with the same absolute value as m
+ */
+magnitude turnToNegative(magnitude m) {
+    magnitude temp = m | MSB_MASK;
+    return temp;
+}
+
 int main() {
-    test_addDifferentSigns();
+    test_turnToNegative();
     return 0;
 }
+
