@@ -16,8 +16,20 @@ magnitude turnToPositive(magnitude m);
 magnitude turnToNegative(magnitude m);
 int printMagnitude(magnitude m);
 
+magnitude multi(magnitude a, magnitude b) {
+    //if one is zero
+    if (isZero(a) || isZero(b)) {
+        return 0;
+    }
+    //if both positive
+    //if both negative
+    //if different sign
+    printf("error\n");
+    return 123123123;
+}
+
 /**
- * @brief 
+ * @brief This functio
  * 
  * @param a 
  * @param b 
@@ -49,7 +61,13 @@ magnitude add(magnitude a, magnitude b) {
     printf("error");
     return 0;
 }
-
+/**
+ * @brief 
+ * 
+ * @param a 
+ * @param b 
+ * @return magnitude 
+ */
 magnitude sub(magnitude a, magnitude b) {
     //check for sign
     bool aPositive = (a & MSB_MASK) == 0 ? true : false;
@@ -73,6 +91,7 @@ magnitude sub(magnitude a, magnitude b) {
         return sub(b, a);
     }
     //if diffrenet sign
+    //a- (-b) = a + b
     if (aPositive && !bPositive) {
         b = turnToPositive(b);
         return add(a, b);
@@ -224,7 +243,7 @@ magnitude turnToNegative(magnitude m) {
 }
 
 int main() {
-    test_turnToNegative();
+    test_multiOneIsZero();
     return 0;
 }
 
