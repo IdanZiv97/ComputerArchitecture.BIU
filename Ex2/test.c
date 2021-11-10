@@ -289,12 +289,12 @@ void test_turnToNegative() {
     //want to check if it does not effect already neg numbers
     magnitude test6 = turnToNegative(m6);
 
-    assert(printMagnitude(test1) == 0x80000161 ? printf("Passed test1\n") : printf("test1: expected %x got %x\n", 0x80000161, printMagnitude(test1)));
-    assert(printMagnitude(test2) == 0x8000113c ? printf("Passed test2\n") : printf("test2: expected %x got %x\n", 0x8000113c, printMagnitude(test2)));
-    assert(printMagnitude(test3) == 0x80000001 ? printf("Passed test3\n") : printf("test3: expected %x got %x\n", 0x80000001, printMagnitude(test3)));
-    assert(printMagnitude(test4) == 0x80000fff ? printf("Passed test4\n") : printf("test4: expected %x got %x\n", 0x80000fff, printMagnitude(test4)));
-    assert(printMagnitude(test5) == 0x8fffffff ? printf("Passed test5\n") : printf("test5: expected %x got %x\n", 0x8fffffff, printMagnitude(test5)));
-    assert(printMagnitude(test6) == 0x800000ff ? printf("Passed test6\n") : printf("test4: expected %x got %x\n", 0x800000ff, printMagnitude(test6)));
+    assert(printMagnitude(test1) == -353 ? printf("Passed test1\n") : printf("test1: expected %x got %x\n", -353, printMagnitude(test1)));
+    assert(printMagnitude(test2) == -4412 ? printf("Passed test2\n") : printf("test2: expected %x got %x\n", -4412, printMagnitude(test2)));
+    assert(printMagnitude(test3) == -1 ? printf("Passed test3\n") : printf("test3: expected %x got %x\n", -1, printMagnitude(test3)));
+    assert(printMagnitude(test4) == -4095 ? printf("Passed test4\n") : printf("test4: expected %x got %x\n", -4095, printMagnitude(test4)));
+    assert(printMagnitude(test5) == -2147483647 ? printf("Passed test5\n") : printf("test5: expected %x got %x\n", -2147483647, printMagnitude(test5)));
+    assert(printMagnitude(test6) == -255 ? printf("Passed test6\n") : printf("test4: expected %x got %x\n", -255, printMagnitude(test6)));
 }
 void test_turnToPositive() {
     printf("Tests for turnToPositive\n");
