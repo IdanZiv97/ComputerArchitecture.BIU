@@ -23,6 +23,49 @@ int printMagnitude(magnitude m) {
     return (int) absValue * sign;
 }
 //Tests functions
+void test_multiOneIsZero(){
+    printf("Test for multiOneIsZero\n\n");
+
+    magnitude zero1 = 0;
+    magnitude zero2 = 0x80000000;
+
+    magnitude m1 = 3452354;
+    magnitude m2 = 0x80000043;
+    magnitude m3 = 1231;
+    magnitude m4 = 1;
+    magnitude m5 = 0x8080320f;
+    magnitude m6 = 0x80900030;
+
+    magnitude test1 = multi(zero1, m1);
+    magnitude test2 = multi(zero1, m2);
+    magnitude test3 = multi(zero1, m3);
+    magnitude test4 = multi(m4, zero1);
+    magnitude test5 = multi(m5, zero1);
+    magnitude test6 = multi(m6, zero1);
+    magnitude test7 = multi(zero1, zero2);
+    magnitude test8 = multi(zero2, zero1);
+    magnitude test9 = multi(zero2, m1);
+    magnitude test10 = multi(zero2, m2);
+    magnitude test11 = multi(zero2, m3);
+    magnitude test12 = multi(m4, zero2);
+    magnitude test13 = multi(m5, zero2);
+    magnitude test14 = multi(m6, zero2);
+
+    assert(printMagnitude(test1) == 0 ? printf("Passed test\n") : printf("test1: expected 0 got %x\n", printMagnitude(test1)));
+    assert(printMagnitude(test2) == 0 ? printf("Passed test2\n") : printf("test2: expected 0 got %x\n", printMagnitude(test2)));
+    assert(printMagnitude(test3) == 0 ? printf("Passed test3\n") : printf("test3: expected 0 got %x\n", printMagnitude(test3)));
+    assert(printMagnitude(test4) == 0 ? printf("Passed test4\n") : printf("test4: expected 0 got %x\n", printMagnitude(test4)));
+    assert(printMagnitude(test5) == 0 ? printf("Passed test5\n") : printf("test5: expected 0 got %x\n", printMagnitude(test5)));
+    assert(printMagnitude(test6) == 0 ? printf("Passed test6\n") : printf("test6: expected 0 got %x\n", printMagnitude(test6)));
+    assert(printMagnitude(test7) == 0 ? printf("Passed test7\n") : printf("test7: expected 0 got %x\n", printMagnitude(test7)));
+    assert(printMagnitude(test8) == 0 ? printf("Passed test8\n") : printf("test8: expected 0 got %x\n", printMagnitude(test8)));
+    assert(printMagnitude(test9) == 0 ? printf("Passed test9\n") : printf("test9: expected 0 got %x\n", printMagnitude(test9)));
+    assert(printMagnitude(test10) == 0 ? printf("Passed test10\n") : printf("test10: expected 0 got %x\n", printMagnitude(test10)));
+    assert(printMagnitude(test11) == 0 ? printf("Passed test11\n") : printf("test11: expected 0 got %x\n", printMagnitude(test11)));
+    assert(printMagnitude(test12) == 0 ? printf("Passed test12\n") : printf("test12: expected 0 got %x\n", printMagnitude(test12)));
+    assert(printMagnitude(test13) == 0 ? printf("Passed test13\n") : printf("test13: expected 0 got %x\n", printMagnitude(test13)));
+    assert(printMagnitude(test14) == 0 ? printf("Passed test14\n") : printf("test14: expected 0 got %x\n", printMagnitude(test14)));
+}
 void test_subAposBneg() {
     printf("Tests for sub function when a is positive and b is negative\n\n");
 
