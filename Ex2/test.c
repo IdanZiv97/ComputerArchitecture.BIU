@@ -23,6 +23,79 @@ int printMagnitude(magnitude m) {
     return (int) absValue * sign;
 }
 //Tests functions
+void test_mutltiSametSign() {
+    printf("Test for multi when the nubmers are with the same sign\n\n");
+
+    //Positive numbers
+    magnitude a1 = 32;
+    magnitude a2 = 0x2a;//42
+    magnitude a3 = 0x17f3;//6131
+    magnitude a4 = 121;
+    magnitude a5 = 2131;
+    magnitude a6 = 0x7e5;//2021
+
+    //Negative Numbers
+    magnitude b1 = 0x8000000c;//-12
+    magnitude b2 = 0x800006ca;//-1738
+    magnitude b3 = 0x80001696;//-5782
+    magnitude b4 = 0x8000270f;//-9999
+    magnitude b5 = 0x80004c18;//-19480
+    magnitude b6 = 0x8000000d;//-13
+
+    //positive tests
+    magnitude test1 = multi(a1, a2);//1344
+    magnitude test2 = multi(a4, a5);//257851
+    magnitude test3 = multi(a5, a3);//13065161
+    magnitude test4 = multi(a3, a4);//741851
+    magnitude test5 = multi(a4, a1);//3872
+    magnitude test6 = multi(a5, a2);//89502
+    magnitude test7 = multi(a6, a6);//4084441
+    magnitude test8 = multi(a6, a3);//12390751
+    magnitude test9 = multi(a1, a6);//64672
+    magnitude test10 = multi(a3, a3);//37589161
+    magnitude test11 = multi(a6, a2);//84882
+    magnitude test12 = multi(a4, a6);//244541
+
+    assert(printMagnitude(test1) == 1344 ? printf("Passed test1\n") : printf("test1: expected %d got %d\n", 1344, printMagnitude(test1)));
+    assert(printMagnitude(test2) == 257851 ? printf("Passed test2\n") : printf("test2: expected %d got %d\n", 257851, printMagnitude(test2)));
+    assert(printMagnitude(test3) == 13065161 ? printf("Passed test3\n") : printf("test3: expected %d got %d\n", 13065161, printMagnitude(test3)));
+    assert(printMagnitude(test4) == 741851 ? printf("Passed test4\n") : printf("test4: expected %d got %d\n", 741851, printMagnitude(test4)));
+    assert(printMagnitude(test5) == 3872 ? printf("Passed test5\n") : printf("test5: expected %d got %d\n", 3872, printMagnitude(test5)));
+    assert(printMagnitude(test6) == 89502 ? printf("Passed test6\n") : printf("test6: expected %d got %d\n", 89502, printMagnitude(test6)));
+    assert(printMagnitude(test7) == 4084441 ? printf("Passed test7\n") : printf("test7: expected %d got %d\n", 4084441, printMagnitude(test7)));
+    assert(printMagnitude(test8) == 12390751 ? printf("Passed test8\n") : printf("test8: expected %d got %d\n", 12390751, printMagnitude(test8)));
+    assert(printMagnitude(test9) == 64672 ? printf("Passed test9\n") : printf("test9: expected %d got %d\n", 64672, printMagnitude(test9)));
+    assert(printMagnitude(test10) == 37589161 ? printf("Passed test10\n") : printf("test10: expected %d got %d\n", 37589161, printMagnitude(test10)));
+    assert(printMagnitude(test11) == 84882 ? printf("Passed test11\n") : printf("test11: expected %d got %d\n", 84882, printMagnitude(test11)));
+    assert(printMagnitude(test12) == 244541 ? printf("Passed test12\n") : printf("test12: expected %d got %d\n", 244541, printMagnitude(test12)));
+
+    //Negative tests
+    magnitude test13 = multi(b1, b2);//20856
+    magnitude test14 = multi(b4, b5);//194780520
+    magnitude test15 = multi(b5, b3);//112633360
+    magnitude test16 = multi(b3, b4);//57814218
+    magnitude test17 = multi(b4, b1);//119988
+    magnitude test18 = multi(b5, b2);//33856240
+    magnitude test19 = multi(b6, b6);//169
+    magnitude test20 = multi(b6, b3);//75166
+    magnitude test21 = multi(b1, b6);//156
+    magnitude test22 = multi(b3, b3);//33431524
+    magnitude test23 = multi(b6, b2);//22594
+    magnitude test24 = multi(b4, b6);//129987
+
+    assert(printMagnitude(test13) == 20856 ? printf("Passed test13\n") : printf("test13: expected %d got %d\n", 20856, printMagnitude(test13)));
+    assert(printMagnitude(test14) == 194780520 ? printf("Passed test14\n") : printf("test14: expected %d got %d\n", 194780520, printMagnitude(test14)));
+    assert(printMagnitude(test15) == 112633360 ? printf("Passed test15\n") : printf("test15: expected %d got %d\n", 112633360, printMagnitude(test15)));
+    assert(printMagnitude(test16) == 57814218 ? printf("Passed test16\n") : printf("test16: expected %d got %d\n", 57814218, printMagnitude(test16)));
+    assert(printMagnitude(test17) == 119988 ? printf("Passed test17\n") : printf("test17: expected %d got %d\n", 119988, printMagnitude(test17)));
+    assert(printMagnitude(test18) == 33856240 ? printf("Passed test18\n") : printf("test18: expected %d got %d\n", 33856240, printMagnitude(test18)));
+    assert(printMagnitude(test19) == 169 ? printf("Passed test19\n") : printf("test19: expected %d got %d\n", 169, printMagnitude(test19)));
+    assert(printMagnitude(test20) == 75166 ? printf("Passed test20\n") : printf("test20: expected %d got %d\n", 75166, printMagnitude(test20)));
+    assert(printMagnitude(test21) == 156 ? printf("Passed test21\n") : printf("test21: expected %d got %d\n", 156, printMagnitude(test21)));
+    assert(printMagnitude(test22) == 33431524 ? printf("Passed test22\n") : printf("test22: expected %d got %d\n", 33431524, printMagnitude(test22)));
+    assert(printMagnitude(test23) == 22594 ? printf("Passed test23\n") : printf("test23: expected %d got %d\n", 22594, printMagnitude(test23)));
+    assert(printMagnitude(test24) == 129987 ? printf("Passed test24\n") : printf("test24: expected %d got %d\n", 129987, printMagnitude(test24)));
+}
 void test_multiOneIsZero(){
     printf("Test for multiOneIsZero\n\n");
 
