@@ -17,11 +17,23 @@ magnitude turnToNegative(magnitude m);
 int printMagnitude(magnitude m);
 
 magnitude multi(magnitude a, magnitude b) {
+    //check for sign
+    bool aPositive = (a & MSB_MASK) == 0 ? true : false;
+    bool bPositive = (b & MSB_MASK) == 0 ? true : false;
     //if one is zero
     if (isZero(a) || isZero(b)) {
         return 0;
     }
     //if both positive
+    if (aPositive && bPositive) {
+        magnitude result = a * b;
+        return result;
+    } else if (!aPositive && !bPositive) {
+        a = turnToPositive(a);
+        b = turnToPositive(b); 
+        magnitude result = a * b;
+        return result;
+    }
     //if both negative
     //if different sign
     printf("error\n");
@@ -243,7 +255,7 @@ magnitude turnToNegative(magnitude m) {
 }
 
 int main() {
-    test_multiOneIsZero();
+    test_mutltiSametSign();
     return 0;
 }
 
