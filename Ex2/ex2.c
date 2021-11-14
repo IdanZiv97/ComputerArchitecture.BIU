@@ -72,11 +72,17 @@ magnitude add(magnitude a, magnitude b) {
     }
     // if the sign is different - it like subtracting to positive integers
     if (aPositive && !bPositive) {
-        return sub(a, turnToPositive(b));
+        magnitude result = a - b;
+        //becuase the change of sign:
+        result = result * (-1);
+        return result;
     }
     //-a+b = b-a
     if (!aPositive && bPositive) {
-        return sub(b,turnToPositive(a));
+        magnitude result = b - a;
+        //becuase the change of sign:
+        result = result * (-1);
+        return result;
     }
     //check for overflow/underflow
     printf("error");
@@ -264,7 +270,6 @@ magnitude turnToNegative(magnitude m) {
 }
 
 int main() {
-    // test_mutltiSametSign();
-    test_multiDiffSign();
+    tests();
     return 0;
 }
