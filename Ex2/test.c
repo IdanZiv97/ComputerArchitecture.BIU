@@ -23,8 +23,51 @@ int printMagnitude(magnitude m) {
     return (int) absValue * sign;
 }
 //Tests functions
+void test_multiDiffSign() {
+    printf("Test for multi() when the numbers have diferent signs\n\n");
+
+    magnitude a1 = 32;
+    magnitude a2 = 0x8000002a;//-42
+    magnitude a3 = 0x800017f3;//-6131
+    magnitude a4 = 121;
+    magnitude a5 = 2131;
+    magnitude a6 = 0x800007e5;//-2021
+
+    magnitude b1 = 12;
+    magnitude b2 = 0x800006ca;//-1738
+    magnitude b3 = 5782;
+    magnitude b4 = 9999;
+    magnitude b5 = 0x80004c18;//-19480
+    magnitude b6 = 0x8000000d;//-13
+
+    magnitude test1 = multi(a1, b2);//-55616 -> 0x800006aa
+    magnitude test2 = multi(a4, b5);//-2357080 -> 0x8023f758
+    magnitude test3 = multi(a5, b6);//-27703 -> 0x80006c37
+    magnitude test4 = multi(a1, b6);//-416 -> 0x800001a0
+    magnitude test5 = multi(a4, b2);//-210298 -> 0x8003357a
+    magnitude test6 = multi(a5, b5);//-41511880 -> 0x82796bc8
+    magnitude test7 = multi(a2, b1);//-504 -> 0x800001f8
+    magnitude test8 = multi(a6, b3);//-11685422 -> 0x80b24e2e
+    magnitude test9 = multi(a3, b4);//-61303869 -> 0x83a76c3d
+    magnitude test10 = multi(a6, b1);//-24252 -> 0x80005ebc
+    magnitude test11 = multi(a3, b3);//-35449442 -> 0x8036176e
+    magnitude test12 = multi(a2, b4);//-419958 -> 0x80066876
+
+    assert(printMagnitude(test1) == -55616  ? printf("Passed test1\n") : printf("test1: expected %d got %d\n", -55616, printMagnitude(test1)));
+    assert(printMagnitude(test2) == -2357080 ? printf("Passed test2\n") : printf("test2: expected %d got %d\n", -2357080, printMagnitude(test2)));
+    assert(printMagnitude(test3) == -27703 ? printf("Passed test3\n") : printf("test3: expected %d got %d\n", -27703, printMagnitude(test3)));
+    assert(printMagnitude(test4) == -416 ? printf("Passed test4\n") : printf("test4: expected %d got %d\n", -416, printMagnitude(test4)));
+    assert(printMagnitude(test5) == -210298 ? printf("Passed test5\n") : printf("test5: expected %d got %d\n", -210298, printMagnitude(test5)));
+    assert(printMagnitude(test6) == -41511880 ? printf("Passed test6\n") : printf("test6: expected %d got %d\n", -41511880, printMagnitude(test6)));
+    assert(printMagnitude(test7) == -504 ? printf("Passed test7\n") : printf("test7: expected %d got %d\n", 0x800001f8, printMagnitude(test7)));
+    assert(printMagnitude(test8) == -11685422 ? printf("Passed test8\n") : printf("test8: expected %d got %d\n", -11685422, printMagnitude(test8)));
+    assert(printMagnitude(test9) == -61303869 ? printf("Passed test9\n") : printf("test9: expected %d got %d\n", -61303869, printMagnitude(test9)));
+    assert(printMagnitude(test10) == -24252 ? printf("Passed test10\n") : printf("test10: expected %d got %d\n", -24252, printMagnitude(test10)));
+    assert(printMagnitude(test11) == -35449442 ? printf("Passed test11\n") : printf("test11: expected %d got %d\n", -35449442, printMagnitude(test11)));
+    assert(printMagnitude(test12) == -419958 ? printf("Passed test12\n") : printf("test12: expected %d got %d\n", -419958, printMagnitude(test12))); 
+}
 void test_mutltiSametSign() {
-    printf("Test for multi when the nubmers are with the same sign\n\n");
+    printf("\nTest for multi when the nubmers are with the same sign\n\n");
 
     //Positive numbers
     magnitude a1 = 32;
