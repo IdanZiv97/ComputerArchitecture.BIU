@@ -70,6 +70,11 @@ magnitude add(magnitude a, magnitude b) {
     if (aPositive && bPositive) {
         return a + b;
     }
+    //if both negative
+    if (!aPositive && !bPositive) {
+        magnitude result = a + b;
+        return result;
+    }
     // if the sign is different - it like subtracting to positive integers
     if (aPositive && !bPositive) {
         magnitude result = a - b;
