@@ -28,14 +28,23 @@ magnitude multi(magnitude a, magnitude b) {
     if (aPositive && bPositive) {
         magnitude result = a * b;
         return result;
+    //if both negative
     } else if (!aPositive && !bPositive) {
         a = turnToPositive(a);
         b = turnToPositive(b); 
         magnitude result = a * b;
         return result;
     }
-    //if both negative
-    //if different sign
+    //if different sign - the result will always be negative
+    if (aPositive && !bPositive) {
+        magnitude posB = turnToPositive(b);
+        magnitude result = multi(a, posB);
+        return turnToNegative(result);
+    } else if (!aPositive && bPositive) {
+        magnitude posA = turnToPositive(a);
+        magnitude result = multi(posA, b);
+        return turnToNegative(result);
+    }
     printf("error\n");
     return 123123123;
 }
@@ -255,7 +264,8 @@ magnitude turnToNegative(magnitude m) {
 }
 
 int main() {
-    test_mutltiSametSign();
+    // test_mutltiSametSign();
+    test_multiDiffSign();
     return 0;
 }
 
