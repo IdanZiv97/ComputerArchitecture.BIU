@@ -268,4 +268,3 @@ int main() {
     test_multiDiffSign();
     return 0;
 }
-
