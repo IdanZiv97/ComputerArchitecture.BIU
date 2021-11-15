@@ -122,37 +122,48 @@ magnitude sub(magnitude a, magnitude b) {
     //check for sign
     bool aPositive = (a & MSB_MASK) == 0 ? true : false;
     bool bPositive = (b & MSB_MASK) == 0 ? true : false;
+    //Convert to two's complement presentation
+    int a_int = turnToInteger(a, aPositive);
+    int b_int = turnToInteger(b, bPositive);
+    //if both of them are zero
+    if (isZero(a) && isZero(b)) {
+        return 0;
     //if one of the is zero
-    if (isZero(a)) {
-        b = (bPositive == false) ? turnToPositive(b) : (-1 * b);
+    } else if (isZero(a)) {
+        b = (bPositive == false) ? turnToPositive(b) : turnToNegative(b);
         return b;
     } else if (isZero(b)) {
         return a;
     }
+    //Local variables to hold the results
+    int int_result;
+    magnitude magnitude_result;
     //if two positive numbers
     if (aPositive && bPositive) {
-        return a - b;
+        int_result = a - b;
+        magnitude_result = turnToMagnitude(int_result);
     }
-    //if to negative numbers - b becomes positive and it is like creating b-|a|
-    //-a-(-b)=-a+b=b-a=b-|a|
+    //if two negative numbers: -a-(-b)=b-a=b-|a|
     if (!aPositive && !bPositive) {
         b = turnToPositive(b);
         a = turnToPositive(a);
-        return sub(b, a);
+        magnitude_result = sub(b, a);
     }
     //if diffrenet sign
     //a- (-b) = a + b
     if (aPositive && !bPositive) {
-        b = turnToPositive(b);
-        return add(a, b);
+        b_int = b_int * (-1);
+        int_result = a + b;
+        magnitude_result = turnToMagnitude(int_result);
     }
-    //-a-b = -(a+b)
+    //-a-b=-(a+b)
     if (!aPositive && bPositive) {
-        magnitude result = add(turnToPositive(a), turnToPositive(b));
-        return turnToNegative(result);
+        a_int = a_int * (-1);
+        int_result = a + b;
+        int_result *= (-1);
+        magnitude_result = turnToMagnitude(int_result);
     }
-    printf("error");
-    return 0;
+    return magnitude_result;
 }
 
 /**
