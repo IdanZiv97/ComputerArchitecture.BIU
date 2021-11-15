@@ -5,7 +5,6 @@
 #define MSB_MASK 0x80000000
 #define ZERO_SIGNED MSB_MASK 
 #define ABS_MASK 0x7fffffff
-#define BYTE 8;
 typedef enum {
     false = 0,
     true = 1,
@@ -14,6 +13,8 @@ typedef enum {
 bool isZero(magnitude m);
 magnitude turnToPositive(magnitude m);
 magnitude turnToNegative(magnitude m);
+int turnToInteger(magnitude m, bool positive);
+magnitude turnToMagnitude(int i);
 int printMagnitude(magnitude m);
 
 magnitude multi(magnitude a, magnitude b) {
@@ -60,38 +61,55 @@ magnitude add(magnitude a, magnitude b) {
     //check for sign
     bool aPositive = (a & MSB_MASK) == 0 ? true : false;
     bool bPositive = (b & MSB_MASK) == 0 ? true : false;
+    //Turn to two's complement integers
+    int a_int = turnToInteger(a, aPositive);
+    int b_int = turnToInteger(b, bPositive);
+    //If both are equal to zero, you don't know which form you will get
+    if (isZero(a) && isZero(b)) {
+        return 0;
     //if one of the numbers is zero - return the other one
-    if (isZero(a)) {
+    } else if (isZero(a)) {
         return b;
     } else if (isZero(b)) {
         return a;
     }
+    //a local result variable
+    int int_result;
+    magnitude magnitude_result;
     //if both positive
     if (aPositive && bPositive) {
-        return a + b;
+        int_result = a_int + b_int;
+        //check for overflow - MSB need to be 0 (positive number), or else we need to change it
+        if (int_result < 0) {
+            int_result = int_result & ABS_MASK;
+            magnitude_result = turnToMagnitude(int_result);
+        } else {
+            magnitude_result = turnToMagnitude(int_result);
+        }
     }
     //if both negative
     if (!aPositive && !bPositive) {
-        magnitude result = a + b;
-        return result;
+        int_result = a_int + b_int;
+        //check for overflow - must be negative, so MSB should be 1
+        if (int_result > 0) {
+            int_result = int_result | MSB_MASK;
+            magnitude_result = turnToMagnitude(int_result);
+        } else {
+            magnitude_result = turnToMagnitude(int_result);
+        }
     }
-    // if the sign is different - it like subtracting to positive integers
+    //depends on the '>' relation between a,b the result should be differ in sign
     if (aPositive && !bPositive) {
-        magnitude result = a - b;
-        //becuase the change of sign:
-        result = result * (-1);
-        return result;
+        int_result = a_int + b_int;
+        magnitude_result = turnToMagnitude(int_result);
     }
     //-a+b = b-a
     if (!aPositive && bPositive) {
-        magnitude result = b - a;
-        //becuase the change of sign:
-        result = result * (-1);
-        return result;
+        int_result = a_int + b_int;
+        magnitude_result = turnToMagnitude(int_result);
     }
-    //check for overflow/underflow
-    printf("error");
-    return 0;
+    // printf("error");
+    return magnitude_result;
 }
 /**
  * @brief 
@@ -273,8 +291,46 @@ magnitude turnToNegative(magnitude m) {
     magnitude temp = m | MSB_MASK;
     return temp;
 }
-
-int main() {
+/**
+ * @brief This function converts the given number, in a sign-magnitude representation, to its 
+ * two's complement representation. The magnitude is "stripped" from its MSB to get the absolute value
+ * of the number, which in its turn is multiplied by the sign of the number.
+ * @param m an integer is sign-magnitude representation
+ * @param positive if it is true than the sign remains 1 and false the sign becomes (-1) 
+ * @return the number in two's complement number
+ */
+int turnToInteger(magnitude m, bool positive) {
+    int sign = positive ? 1: (-1);
+    int absoluteValue = m & ABS_MASK;
+    return absoluteValue * sign;
+}
+magnitude turnToMagnitude(int i) {
+    //get the absolute value
+    unsigned int absoluteValue;
+    if (i >= 0) {
+        absoluteValue = i;
+    } else {
+        absoluteValue = i * (-1);
+    }
+    magnitude m = absoluteValue;
+    if (i < 0) {
+        //Turn the MSB to 1
+        m = m | MSB_MASK;
+    }
+    return m;
+    // //if positive just make sure that the last bit is zero
+    // if (i > 0) {
+    //     magnitude m = i;
+    //     //make sure the MSB is 0
+    //     return m & MSB_MASK;
+    // //if negative - you want the absoulute value and turn the MSB on.
+    // } else {
+    //     int absoluteValue = i * (-1);
+    //     magnitude m = i & ABS_MASK;
+    //     return m | MSB_MASK;
+    // }
+}
+ int main() {
     tests();
     return 0;
 }
