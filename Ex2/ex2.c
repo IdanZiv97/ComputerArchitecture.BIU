@@ -51,10 +51,21 @@ magnitude multi(magnitude a, magnitude b) {
     //if different sign - the result will always be negative
     if (aPositive && !bPositive) {
         int_result = a_int * b_int;
-        magnitude_result = turnToMagnitude(int_result);
+        //If the result is positive - change the MSB to 1
+        if (int_result >= 0) {
+            int_result = int_result | MSB_MASK;
+            magnitude_result = turnToMagnitude(int_result);
+        } else {
+            magnitude_result = turnToMagnitude(int_result);
+        }
     } else if (!aPositive && bPositive) {
         int_result = a_int * b_int;
-        magnitude_result = turnToMagnitude(int_result);
+        if (int_result >= 0) {
+            int_result = int_result | MSB_MASK;
+            magnitude_result = turnToMagnitude(int_result);
+        } else {
+            magnitude_result = turnToMagnitude(int_result);
+        }
     }
     return magnitude_result;
 }
