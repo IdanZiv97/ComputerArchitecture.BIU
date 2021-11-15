@@ -298,6 +298,9 @@ magnitude turnToPositive(magnitude m) {
  * @return a negative magnitude with the same absolute value as m
  */
 magnitude turnToNegative(magnitude m) {
+    if (isZero(m)) {
+        return 0;
+    }
     magnitude temp = m | MSB_MASK;
     return temp;
 }
