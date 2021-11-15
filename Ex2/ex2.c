@@ -35,12 +35,11 @@ magnitude multi(magnitude a, magnitude b) {
     if (aPositive && bPositive) {
         int_result = a_int * b_int;
         //check for overflow
-        magnitude temp = turnToMagnitude(int_result);
-        //check for overflow - temp should be positive
-        if ((temp & MSB_MASK) != 0) {
-            magnitude_result = turnToPositive(temp);
+        if (int_result < 0) {
+            int_result = int_result & ABS_MASK;
+            magnitude_result = turnToMagnitude(int_result);
         } else {
-            magnitude_result = temp;
+            magnitude_result = int_result;
         }
     //if both negative - should be positive
     } else if (!aPositive && !bPositive) {
