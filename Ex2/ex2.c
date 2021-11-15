@@ -304,6 +304,7 @@ magnitude turnToNegative(magnitude m) {
     magnitude temp = m | MSB_MASK;
     return temp;
 }
+
 /**
  * @brief This function converts the given number, in a sign-magnitude representation, to its 
  * two's complement representation. The magnitude is "stripped" from its MSB to get the absolute value
@@ -317,6 +318,14 @@ int turnToInteger(magnitude m, bool positive) {
     int absoluteValue = m & ABS_MASK;
     return absoluteValue * sign;
 }
+
+/**
+ * @brief this function turn a given int to its sign-magnitude representation
+ * We calculate the absolute value of the number and then, given its sign, we handle
+ * the MSB
+ * @param i a signed number in two's complement
+ * @return the sign-mangnitude representation of i
+ */
 magnitude turnToMagnitude(int i) {
     //get the absolute value
     unsigned int absoluteValue;
@@ -331,18 +340,8 @@ magnitude turnToMagnitude(int i) {
         m = m | MSB_MASK;
     }
     return m;
-    // //if positive just make sure that the last bit is zero
-    // if (i > 0) {
-    //     magnitude m = i;
-    //     //make sure the MSB is 0
-    //     return m & MSB_MASK;
-    // //if negative - you want the absoulute value and turn the MSB on.
-    // } else {
-    //     int absoluteValue = i * (-1);
-    //     magnitude m = i & ABS_MASK;
-    //     return m | MSB_MASK;
-    // }
 }
+
  int main() {
     tests();
     return 0;
