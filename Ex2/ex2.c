@@ -81,18 +81,21 @@ magnitude add(magnitude a, magnitude b) {
     //check for sign
     bool aPositive = (a & MSB_MASK) == 0 ? true : false;
     bool bPositive = (b & MSB_MASK) == 0 ? true : false;
+    //check for zero
+    bool aZero = isZero(a);
+    bool bZero = isZero(b);
+    //If both are equal to zero, you don't know which form you will get
+    if (aZero && bZero) {
+        return 0;
+    //if one of the numbers is zero - return the other one
+    } else if (aZero) {
+        return b;
+    } else if (bZero) {
+        return a;
+    }
     //Turn to two's complement integers
     int a_int = turnToInteger(a, aPositive);
     int b_int = turnToInteger(b, bPositive);
-    //If both are equal to zero, you don't know which form you will get
-    if (isZero(a) && isZero(b)) {
-        return 0;
-    //if one of the numbers is zero - return the other one
-    } else if (isZero(a)) {
-        return b;
-    } else if (isZero(b)) {
-        return a;
-    }
     //a local result variable
     int int_result;
     magnitude magnitude_result;
