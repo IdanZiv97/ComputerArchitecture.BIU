@@ -167,7 +167,8 @@ void test_multiDiffSign() {
     assert(printMagnitude(test9) == -61303869 ? printf("Passed test9\n") : printf("test9: expected %d got %d\n", -61303869, printMagnitude(test9)));
     assert(printMagnitude(test10) == -24252 ? printf("Passed test10\n") : printf("test10: expected %d got %d\n", -24252, printMagnitude(test10)));
     assert(printMagnitude(test11) == -35449442 ? printf("Passed test11\n") : printf("test11: expected %d got %d\n", -35449442, printMagnitude(test11)));
-    assert(printMagnitude(test12) == -419958 ? printf("Passed test12\n") : printf("test12: expected %d got %d\n", -419958, printMagnitude(test12))); 
+    assert(printMagnitude(test12) == -419958 ? printf("Passed test12\n") : printf("test12: expected %d got %d\n", -419958, printMagnitude(test12)));
+    printf("\n");
 }
 void test_mutltiSametSign() {
     printf("\nTest for multi when the nubmers are with the same sign\n\n");
@@ -241,6 +242,8 @@ void test_mutltiSametSign() {
     assert(printMagnitude(test22) == 33431524 ? printf("Passed test22\n") : printf("test22: expected %d got %d\n", 33431524, printMagnitude(test22)));
     assert(printMagnitude(test23) == 22594 ? printf("Passed test23\n") : printf("test23: expected %d got %d\n", 22594, printMagnitude(test23)));
     assert(printMagnitude(test24) == 129987 ? printf("Passed test24\n") : printf("test24: expected %d got %d\n", 129987, printMagnitude(test24)));
+
+    printf("\n");
 }
 void test_multiOneIsZero(){
     printf("Test for multiOneIsZero\n\n");
@@ -284,6 +287,8 @@ void test_multiOneIsZero(){
     assert(printMagnitude(test12) == 0 ? printf("Passed test12\n") : printf("test12: expected 0 got %x\n", printMagnitude(test12)));
     assert(printMagnitude(test13) == 0 ? printf("Passed test13\n") : printf("test13: expected 0 got %x\n", printMagnitude(test13)));
     assert(printMagnitude(test14) == 0 ? printf("Passed test14\n") : printf("test14: expected 0 got %x\n", printMagnitude(test14)));
+
+    printf("\n");
 }
 void test_subAposBneg() {
     printf("Tests for sub function when a is positive and b is negative\n\n");
@@ -321,8 +326,10 @@ void test_subAposBneg() {
     assert(printMagnitude(test8) == 46497 ? printf("Passed test8\n") : printf("test8: expected %d got %d\n", 46497, printMagnitude(test8)));
     assert(printMagnitude(test9) == 86433 ? printf("Passed test9\n") : printf("test9: expected %d got %d\n", 86433, printMagnitude(test9)));
     assert(printMagnitude(test10) == 327428 ? printf("Passed test10\n") : printf("test10: expected %d got %d\n", 327428, printMagnitude(test10)));
+    printf("\n");
 }
 void test_subTwoNegatives() {
+    printf("Test for sub when the numbers are both negative\n\n");
     magnitude m1 = 0x800189F3;//-100851
     magnitude m2 = 0x80035710;//-218896
     magnitude m3 = 0x80000025;//-37
@@ -356,8 +363,10 @@ void test_subTwoNegatives() {
     assert(printMagnitude(test9) == 0x80000019 ? printf("Passed test9\n") : printf("test9: expected %x got %x\n", 0x80000019, printMagnitude(test9)));
     assert(printMagnitude(test10) == 0x8001cd1d ? printf("Passed test10\n") : printf("test10: expected %x got %x\n", 0x8001cd1d, printMagnitude(test10)));
     assert(printMagnitude(test11) == 218810 ? printf("Passed test11\n") : printf("test11: expected %d got %d\n", 218810, printMagnitude(test11)));
+    printf("\n");
 }
 void test_subAisZero() {
+    printf("Tests for sub when a is zero\n\n");
     magnitude a = 0;
     magnitude m1 = 0x80000036;//-54
     magnitude m2 = 0x8000aa04;//-43524
@@ -386,9 +395,10 @@ void test_subAisZero() {
     assert(printMagnitude(test7) == -15 ? printf("Passed test7\n") : printf("test7: expected -16 got %d\n", printMagnitude(test7)));
     assert(printMagnitude(test8) == -42 ? printf("Passed test8\n") : printf("test8: expected -42 got %d\n", printMagnitude(test8)));
 
+    printf("\n");
 }
 void test_subPositiveIntegers() {
-    printf("Tests for addPositiveIntegers\n");
+    printf("Tests for addPositiveIntegers\n\n");
     magnitude m1 = 0b0100; //=4
     magnitude m2 = 0b1100; //=12
     magnitude m3 = 0b11011;//=27
@@ -420,7 +430,7 @@ void test_subPositiveIntegers() {
     assert(printMagnitude(test8) == 0 ? printf("Passed test8\n") : printf("test8: expected 0 got %d\n", printMagnitude(test8)));
     assert(printMagnitude(test9) == 0x8000008f ? printf("Passed test9\n") : printf("test8: expected -143 got %d\n", printMagnitude(test8)));
     assert(printMagnitude(test10) == 0x80000036 ? printf("Passed test10\n") : printf("test8: expected %x got %x\n", 0x80000036, printMagnitude(test8)));
-    printf("\ntest10: %x == %x != %x", 0x80000036, printMagnitude(test10), printMagnitude(test5));
+    printf("\n");
 }
 void test_addDifferentSigns() {
     printf("Test for add when the nubmers are in a different sign\n\n");
@@ -464,9 +474,11 @@ void test_addDifferentSigns() {
     assert(printMagnitude(test10) == 0x800007d9 ? printf("Passed test10\n") : printf("test10: expected %x got %x\n", 0x800007d9, printMagnitude(test10)));
     assert(printMagnitude(test11) == 0x8000015d ? printf("Passed test11\n") : printf("test11: expected %x got %x\n", 0x8000015d, printMagnitude(test11)));
     assert(printMagnitude(test12) == 9957 ? printf("Passed test12\n") : printf("test12: expected %d got %d\n", 9957, printMagnitude(test12)));
+
+    printf("\n");
 }
 void test_addPositiveIntegers() {
-    printf("Tests for addPositiveIntegers\n");
+    printf("Tests for addPositiveIntegers\n\n");
     magnitude m1 = 0b0100; //=4
     magnitude m2 = 0b1100; //=12
     magnitude m3 = 0b11011;//=27
@@ -489,6 +501,8 @@ void test_addPositiveIntegers() {
     assert(printMagnitude(test5) == 0 ? printf("Passed test5\n") : printf("test5: expected 0 got %d\n", test5));
     assert(printMagnitude(test6) == 214 ? printf("Passed test6\n") : printf("test6: expected 214 got %d\n", test6));
     assert(printMagnitude(test7) == 29 ? printf("Passed test7\n") : printf("test7: expected 219 got %d\n", test7));
+
+    printf("\n");
 }
 void test_turnToNegative() {
     printf("Test for turnToNegative aid function\n\n");
@@ -514,9 +528,11 @@ void test_turnToNegative() {
     assert(printMagnitude(test4) == -4095 ? printf("Passed test4\n") : printf("test4: expected %x got %x\n", -4095, printMagnitude(test4)));
     assert(printMagnitude(test5) == -2147483647 ? printf("Passed test5\n") : printf("test5: expected %x got %x\n", -2147483647, printMagnitude(test5)));
     assert(printMagnitude(test6) == -255 ? printf("Passed test6\n") : printf("test4: expected %x got %x\n", -255, printMagnitude(test6)));
+
+    printf("\n");
 }
 void test_turnToPositive() {
-    printf("Tests for turnToPositive\n");
+    printf("Tests for turnToPositive\n\n");
     magnitude m1 = 0x8000007b;//-123
     magnitude m2 = 0x80000995;//-2453
     magnitude m3 = 0;
@@ -538,4 +554,6 @@ void test_turnToPositive() {
     assert(printMagnitude(test5) == 34235798 ? printf("Passed test5\n") : printf("test5: expected 34235798 got %d\n", printMagnitude(test5)));
     assert(printMagnitude(test6) == 1 ? printf("Passed test6\n") : printf("test6: expected 1 got %d\n", printMagnitude(test6)));
     assert(printMagnitude(test7) == 2147483647 ? printf("Passed test7\n") : printf("test7: expected 2147483647 got %d\n", printMagnitude(test7)));
+
+    printf("\n");
 }
