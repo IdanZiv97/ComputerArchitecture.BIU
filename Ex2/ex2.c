@@ -21,33 +21,42 @@ magnitude multi(magnitude a, magnitude b) {
     //check for sign
     bool aPositive = (a & MSB_MASK) == 0 ? true : false;
     bool bPositive = (b & MSB_MASK) == 0 ? true : false;
+    //Convert to two's complement presentation
+    int a_int = turnToInteger(a, aPositive);
+    int b_int = turnToInteger(b, bPositive);
     //if one is zero
     if (isZero(a) || isZero(b)) {
         return 0;
     }
+    //Local variables to handle the result
+    int int_result;
+    magnitude magnitude_result;
     //if both positive
     if (aPositive && bPositive) {
-        magnitude result = a * b;
-        return result;
-    //if both negative
+        int_result = a_int * b_int;
+        //check for overflow
+        magnitude temp = turnToMagnitude(int_result);
+        //check for overflow - temp should be positive
+        if ((temp & MSB_MASK) != 0) {
+            magnitude_result = turnToPositive(temp);
+        } else {
+            magnitude_result = temp;
+        }
+    //if both negative - should be positive
     } else if (!aPositive && !bPositive) {
         a = turnToPositive(a);
         b = turnToPositive(b); 
-        magnitude result = a * b;
-        return result;
+        magnitude_result = multi(a, b);
     }
     //if different sign - the result will always be negative
     if (aPositive && !bPositive) {
-        magnitude posB = turnToPositive(b);
-        magnitude result = multi(a, posB);
-        return turnToNegative(result);
+        int_result = a_int * b_int;
+        magnitude_result = turnToMagnitude(int_result);
     } else if (!aPositive && bPositive) {
-        magnitude posA = turnToPositive(a);
-        magnitude result = multi(posA, b);
-        return turnToNegative(result);
+        int_result = a_int * b_int;
+        magnitude_result = turnToMagnitude(int_result);
     }
-    printf("error\n");
-    return 123123123;
+    return magnitude_result;
 }
 
 /**
