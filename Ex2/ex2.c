@@ -152,19 +152,15 @@ magnitude sub(magnitude a, magnitude b) {
     //if diffrenet sign
     //a- (-b) = a + b
     if (aPositive && !bPositive) {
-        b_int = b_int * (-1);
-        int_result = a + b;
-        magnitude_result = turnToMagnitude(int_result);
+        b = turnToPositive(b);
+        magnitude temp = add(a, b);
+        magnitude_result = temp;
     }
     //-a-b=-(a+b)
     if (!aPositive && bPositive) {
         a = turnToPositive(a);
         magnitude temp = add(a, b);
         magnitude_result = turnToNegative(temp);
-        // a_int = a_int * (-1);
-        // int_result = a + b;
-        // int_result *= (-1);
-        // magnitude_result = turnToMagnitude(int_result);
     }
     return magnitude_result;
 }
