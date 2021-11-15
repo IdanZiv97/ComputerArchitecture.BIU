@@ -21,16 +21,22 @@ magnitude multi(magnitude a, magnitude b) {
     //check for sign
     bool aPositive = (a & MSB_MASK) == 0 ? true : false;
     bool bPositive = (b & MSB_MASK) == 0 ? true : false;
-    //Convert to two's complement presentation
-    int a_int = turnToInteger(a, aPositive);
-    int b_int = turnToInteger(b, bPositive);
     //if one is zero
     if (isZero(a) || isZero(b)) {
         return 0;
     }
+    magnitude magnitude_result;
+    //if both are negative numbers
+    if (!aPositive && !bPositive) {
+        a = turnToPositive(a);
+        b = turnToPositive(b); 
+        return magnitude_result = multi(a, b);
+    }
+    //Convert to two's complement presentation
+    int a_int = turnToInteger(a, aPositive);
+    int b_int = turnToInteger(b, bPositive);
     //Local variables to handle the result
     int int_result;
-    magnitude magnitude_result;
     //if both positive
     if (aPositive && bPositive) {
         int_result = a_int * b_int;
@@ -41,11 +47,6 @@ magnitude multi(magnitude a, magnitude b) {
         } else {
             magnitude_result = int_result;
         }
-    //if both negative - should be positive
-    } else if (!aPositive && !bPositive) {
-        a = turnToPositive(a);
-        b = turnToPositive(b); 
-        magnitude_result = multi(a, b);
     }
     //if different sign - the result will always be negative
     if (aPositive && !bPositive) {
