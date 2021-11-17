@@ -17,6 +17,14 @@ int turnToInteger(magnitude m, bool positive);
 magnitude turnToMagnitude(int i);
 int printMagnitude(magnitude m);
 
+/**
+ * @brief This function performes multification of two sign-magnitude numbers.
+ * The function is able to handle cases of overflow, by checking the value of the MSB and
+ * comparing it to the expected value of each operation
+ * @param a an integer in sign-magnitude representation
+ * @param b an integer in sign-magnitude representation
+ * @return the product in sign-magnitude representation
+ */
 magnitude multi(magnitude a, magnitude b) {
     //check for sign
     bool aPositive = (a & MSB_MASK) == 0 ? true : false;
@@ -71,11 +79,12 @@ magnitude multi(magnitude a, magnitude b) {
 }
 
 /**
- * @brief This functio
- * 
- * @param a 
- * @param b 
- * @return magnitude 
+ * @brief This performes an addition of two sign-magnitude numbers.
+ * The function is able to handle cases of overflow, by checking the value of the MSB and
+ * comparing it to the expected value of each operation
+ * @param a an integer in sign-magnitude representation
+ * @param b an integer in sign-magnitude representation
+ * @return the result of the addition in sign-magnitude representation 
  */
 magnitude add(magnitude a, magnitude b) {
     //check for sign
@@ -131,15 +140,15 @@ magnitude add(magnitude a, magnitude b) {
         int_result = a_int + b_int;
         magnitude_result = turnToMagnitude(int_result);
     }
-    // printf("error");
     return magnitude_result;
 }
 /**
- * @brief 
- * 
- * @param a 
- * @param b 
- * @return magnitude 
+ * @brief This function perfomres a subtraction of two sign-magnitude integers.
+ * The function is able to handle cases of overflow, by checking the value of the MSB and
+ * comparing it to the expected value of each operation
+ * @param a an integer in sign-magnitude representation
+ * @param b an integer in sign-magnitude representation
+ * @return the result of the subtraction in sign-magnitude representation 
  */
 magnitude sub(magnitude a, magnitude b) {
     //check for sign
