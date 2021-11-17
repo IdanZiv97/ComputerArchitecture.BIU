@@ -79,7 +79,7 @@ magnitude multi(magnitude a, magnitude b) {
 }
 
 /**
- * @brief This performes an addition of two sign-magnitude numbers.
+ * @brief This function performes an addition of two sign-magnitude numbers.
  * The function is able to handle cases of overflow, by checking the value of the MSB and
  * comparing it to the expected value of each operation
  * @param a an integer in sign-magnitude representation
@@ -154,19 +154,22 @@ magnitude sub(magnitude a, magnitude b) {
     //check for sign
     bool aPositive = (a & MSB_MASK) == 0 ? true : false;
     bool bPositive = (b & MSB_MASK) == 0 ? true : false;
+    //check for zero
+    bool aZero = isZero(a);
+    bool bZero = isZero(b);
+    //if both of them are zero
+    if (aZero && bZero) {
+        return 0;
+    //if one of the is zero
+    } else if (aZero) {
+        b = (bPositive == false) ? turnToPositive(b) : turnToNegative(b);
+        return b;
+    } else if (bZero) {
+        return a;
+    }
     //Convert to two's complement presentation
     int a_int = turnToInteger(a, aPositive);
     int b_int = turnToInteger(b, bPositive);
-    //if both of them are zero
-    if (isZero(a) && isZero(b)) {
-        return 0;
-    //if one of the is zero
-    } else if (isZero(a)) {
-        b = (bPositive == false) ? turnToPositive(b) : turnToNegative(b);
-        return b;
-    } else if (isZero(b)) {
-        return a;
-    }
     //Local variables to hold the results
     int int_result;
     magnitude magnitude_result;
@@ -241,7 +244,6 @@ int greater(magnitude a, magnitude b) {
             }
             mask = mask >> 1;
         }
-        return isGreater;
     }
     //for negative numbers - we check from the 31st for the lesser of the two
     if (!aPositive && !bPositive) {
@@ -256,10 +258,8 @@ int greater(magnitude a, magnitude b) {
             }
             mask = mask >> 1;
         }
-        return isGreater;
     }
-    printf("error");
-    return 10;
+    return isGreater;
 }
 
 /**
@@ -374,7 +374,7 @@ magnitude turnToMagnitude(int i) {
     return m;
 }
 
- int main() {
+int main() {
     tests();
     return 0;
 }
