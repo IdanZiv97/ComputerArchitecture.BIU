@@ -1,3 +1,4 @@
+//318175197 Idan Ziv
 #include <stdio.h>
 #include "ex2.h"
 #define MSB_MASK 0x80000000
