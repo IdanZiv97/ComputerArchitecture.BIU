@@ -1,10 +1,9 @@
 #include <stdio.h>
-#include <assert.h>
 #include "ex2.h"
-#include "test.c"
 #define MSB_MASK 0x80000000
 #define ZERO_SIGNED MSB_MASK 
 #define ABS_MASK 0x7fffffff
+//Defined a boolean enum, for more convenient reading
 typedef enum {
     false = 0,
     true = 1,
@@ -15,7 +14,6 @@ magnitude turnToPositive(magnitude m);
 magnitude turnToNegative(magnitude m);
 int turnToInteger(magnitude m, bool positive);
 magnitude turnToMagnitude(int i);
-int printMagnitude(magnitude m);
 
 /**
  * @brief This function performes multification of two sign-magnitude numbers.
@@ -372,9 +370,4 @@ magnitude turnToMagnitude(int i) {
         m = m | MSB_MASK;
     }
     return m;
-}
-
-int main() {
-    tests();
-    return 0;
 }
