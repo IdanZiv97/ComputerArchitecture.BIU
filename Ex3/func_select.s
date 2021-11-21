@@ -1,4 +1,4 @@
-#318175197 Idan Ziv by me
+#318175197 Idan Ziv
 .section    .rodata
     .align 8
 #cases for switch case
@@ -29,8 +29,8 @@ format_str:     .string: "%s"
     .text
 .global run_func
 .type run_func, @function
-run_func: #the case number is in %rdi
-    #setting the stack acess to the jump tables
+run_func: #the case number is in %rdi    
+    #correcting the input offset to match the first case
     leaq -50(%rdi), %rbx #setting the choice to match the range
     cmpq $10, %rbx #check if the choice is in range
     ja .f_default #if the number is not in range we ha
