@@ -6,7 +6,7 @@
     .text
     .global pstrlen
     .type pstrlen, @function
-pstrlen: #the pstring address is saved on %rdi
+pstrlen: # the pstring address is saved on %rdi
     # There is no need to create a stack frame, since we are not using any local vars
     movq (%rdi), %rax #the length of the pstring is the on the first address of the pstring
     ret
@@ -50,19 +50,18 @@ pstrijcpy: # %rdi - dst, %rsi - src, %rdx -i, %rcx - j
     pushq %rbp
     movq %rsp,      %rbp
     # Check for proper range
-    # test for i < j && j,i != 0 ?
     # test for i < des.length
     cmpb (%rdi),    %dl
-    ja pstrijcpy_invalidInput    # if not - invalid input
+    ja .pstrijcpy_invalidInput    # if not - invalid input
     # test for j < det.length
     cmpb (%rdi),    %cl
-    ja pstrijcpy_invalidInput    # if not - invalid input
+    ja .pstrijcpy_invalidInput    # if not - invalid input
     # test for i < src.length
     cmpb (%rsi),    %dl
-    ja pstrijcpy_invalidInput    # if not - invalid input
+    ja .pstrijcpy_invalidInput    # if not - invalid input
     # test for j < src.length
     cmpb (%rsi),    %cl
-    ja pstrijcpy    # if not - invalid input
+    ja .pstrijcpy_invalidInput    # if not - invalid input
     # first update the pointers - dealing with addresses
     leaq (%rsi, %rdx),      %r8    # src -> src + i
     leaq (%rdi, %rdx),      %r9    # dst -> dst + i
@@ -134,12 +133,25 @@ swapCase: # %rdi - *pstr
     # go next char
     jmp .swapCase_nextChar
 
-
-
-
-
-
-
-
-
-
+    .global pstrijcmp
+    .type pstrijcmp, @function
+pstrijcmp: # %rdi - pstr1, %rsi - pstr2, %rdx - i, %rcx - j
+    # check for valid indexes
+    # test for i < pstr1.length
+    cmpb (%rdi),    %dl
+    ja .pstrijcmp_invalidInput    # if not - invalid input
+    # test for j < pstr1.length
+    cmpb (%rdi),    %cl
+    ja .pstrijcmp_invalidInput    # if not - invalid input
+    # test for i < pstr2.length
+    cmpb (%rsi),    %dl
+    ja .pstrijcmp_invalidInput    # if not - invalid input
+    # test for j < pstr2.length
+    cmpb (%rsi),    %cl
+    ja .pstrijcmp_invalidInput    # if not - invalid input
+    # creating pointers to the right sections of each pstr
+    leaq (%rdi, %rdx),  %r8 # pstr1 + i
+    leaq (%rdi, %rcx),  %r9 # pstr1 + j
+    leaq (%rsi, %rdx),  %r10 # pstr2 + i
+    leaq (%rsi, %rcx), %r11 # pstr2 + j
+    
