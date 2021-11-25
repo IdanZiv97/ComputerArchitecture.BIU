@@ -1,3 +1,4 @@
 #ignore all .out files
 *.out
 *.DS_Store
+*.vscode
