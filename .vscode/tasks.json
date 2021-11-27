@@ -2,9 +2,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "make",
+            "label": "gas",
             "type": "shell",
-            "command": "make",
+            "command": "gcc -ggdb -no-pie -o run_main ${workspaceFolder}run_main.s",
             // use options.cwd property if the Makefile is not in the project root ${workspaceRoot} dir
             "options": {
                 "cwd": "${workspaceRoot}"
@@ -21,7 +21,6 @@
                 "panel": "shared"
             },
             // arg passing example: in this case is executed make QUIET=0
-            "args": ["all"],
             // Use the standard less compilation problem matcher.
         }
     ]

@@ -10,7 +10,7 @@
             "name": "Launch(gdb)",
             "program": "${fileBasenameNoExtension}",
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "make"
+            "preLaunchTask": "gas"
         }
     ]
 }
