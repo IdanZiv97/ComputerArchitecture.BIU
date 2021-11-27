@@ -2,84 +2,27 @@
     "version": "2.0.0",
     "tasks": [
         {
-          "label": "asm32",
-          "type": "shell",
-          "command": "rawfilename=${fileDirname}/${fileBasenameNoExtension}; nasm -F dwarf -g -f elf32 -i ${fileDirname} -o $rawfilename.o ${file}; ld -m elf_i386 -o $rawfilename $rawfilename.o;",
-          "problemMatcher": {
-              "pattern": {
-                "regexp": "error"
-              }
+            "label": "make",
+            "type": "shell",
+            "command": "make",
+            // use options.cwd property if the Makefile is not in the project root ${workspaceRoot} dir
+            "options": {
+                "cwd": "${workspaceRoot}"
             },
-          "presentation": {
-              "focus": true,
-              "panel": "dedicated",
-              "reveal": "silent",
-              "clear": true
-          }
-        },
-        {
-          "label": "asm64",
-          "type": "shell",
-          "command": "rawfilename=${fileDirname}/${fileBasenameNoExtension}; nasm -F dwarf -g -f elf64 -i ${fileDirname} -o $rawfilename.o ${file}; ld -m elf_x86_64 -o $rawfilename $rawfilename.o;",
-          "problemMatcher": {
-              "pattern": {
-                "regexp": "error"
-              }
+            // start the build without prompting for task selection, use "group": "build" otherwise
+            "group": {
+                "kind": "build",
+                "isDefault": true
             },
-          "presentation": {
-              "focus": true,
-              "panel": "dedicated",
-              "reveal": "silent",
-              "clear": true
-          }
-        },
-        {
-          "label": "gas",
-          "type": "shell",
-          "command": "rawfilename=${fileDirname}/${fileBasenameNoExtension}; as --gstabs+ ${file} -o $rawfilename.o; ld $rawfilename.o -o $rawfilename",
-          "problemMatcher": {
-              "pattern": {
-                "regexp": "error"
-              }
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
             },
-          "presentation": {
-              "focus": true,
-              "panel": "dedicated",
-              "reveal": "silent",
-              "clear": true
-          }
-        },
-        {
-          "label": "asm64+gcc",
-          "type": "shell",
-          "command": "rawfilename=${fileDirname}/${fileBasenameNoExtension}; nasm -F dwarf -g -f elf64 -i ${fileDirname} -o $rawfilename.o ${file}; gcc -m64 -o $rawfilename $rawfilename.o;",
-          "problemMatcher": {
-              "pattern": {
-                "regexp": "error"
-              }
-            },
-          "presentation": {
-              "focus": true,
-              "panel": "dedicated",
-              "reveal": "silent",
-              "clear": true
-          }
-        },
-        {
-          "label": "asm32+gcc",
-          "type": "shell",
-          "command": "rawfilename=${fileDirname}/${fileBasenameNoExtension}; nasm -F dwarf -g -f elf32 -i ${fileDirname} -o $rawfilename.o ${file}; gcc -m32 -o $rawfilename $rawfilename.o;",
-          "problemMatcher": {
-              "pattern": {
-                "regexp": "error"
-              }
-            },
-          "presentation": {
-              "focus": true,
-              "panel": "dedicated",
-              "reveal": "silent",
-              "clear": true
-          }
+            // arg passing example: in this case is executed make QUIET=0
+            "args": ["all"],
+            // Use the standard less compilation problem matcher.
         }
     ]
 }
