@@ -1,6 +1,6 @@
 #318175197 Idan Ziv
 .section .rodata
-    .allign 8
+    .align 8
     format_invalidInput: .string "invalid input!\n"
 
     .text
@@ -8,7 +8,7 @@
     .type pstrlen, @function
 pstrlen: # the pstring address is saved on %rdi
     # There is no need to create a stack frame, since we are not using any local vars
-    movq (%rdi), %rax #the length of the pstring is the on the first address of the pstring
+    movq (%rdi), %rax # the length of the pstring is the on the first address of the pstring
     ret
 
     .global replaceChar
@@ -28,7 +28,7 @@ replaceChar: # %rdi- pointer to pstring, %rsi oldChar, %rdx - new char
     # we need to check if the char is valid
     cmpb (%rdi), %sil # check if pstr[i] == oldChar
     je .replaceChar_if
-    addq %1, %rdi # pstr++
+    addq $1, %rdi # pstr++
     jmp .replaceChar_while
 
 .replaceChar_if:
@@ -96,7 +96,7 @@ pstrijcpy: # %rdi - dst, %rsi - src, %rdx -i, %rcx - j
     .type swapCase, @function
 swapCase: # %rdi - *pstr
     # create a pointer to the end
-    movb (%rdi),    %sl 
+    movq (%rdi), %rsi
     leaq (%rdi, %rsi),  %r8 # the end of the str 
 .swapCase_checkChar: # checking if the value of the current char is in a proper range
     # check if pstr[i] < 65 or pstr[i] > 122 - if so it is not a char
