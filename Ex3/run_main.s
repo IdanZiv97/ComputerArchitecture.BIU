@@ -2,102 +2,69 @@
 
 # Tests used, 'tests.sh' by Ron Even and me
 
-    .section .rodata
+.section .rodata
 
     .align 8
-
-
-
-format_scan_d:    .string "%d"
-
-format_scan_s:   .string "%s"
+    format_scan_int:    .string "%d"    # format to be passed as the 1st argument for scaning an int
+    format_scan_string:   .string "%s"    # format to be passed as the 1st argument for scaning a string
 
 	.text
+	.globl	run_main
+	.type	run_main, @function
 
-	.globl	main
+run_main:
 
-	.type	main, @function
+    # create the stack frame for run_main
+    pushq    %rbp  
+    movq    %rsp ,%rbp    # setting the rbp as the current rsp
+    subq    $528, %rsp    # init 528 bytes in the stack for the next varibales. (to allign the stack by 16)
+    # Note: the memory needed for the proccess is actualy 520 bytes (256 bytes per pString, and the choice 4 bytes) but
+    # the number is not divisible by 16, which is required by scanf. So I addd 8 bytes (520 / 16 = 32.5) to make sure the
+    # stack pointer is aligned
 
-main:
+    # getting the 1st pString
 
-pushq   	%rbp
+    # getting the length
+    movq    $format_scan_int, %rdi    # pass the proper scan format as the 1st argument
+    leaq  	-528(%rbp), %rsi    # pass the address in the stack frame of the 1st pstring's length
+    movq  	$0, %rax    # set %rax to 0
+    call  	scanf
+    # getting the string
+    movq  	$format_scan_string, %rdi    # pass the proper scan format as the 1st argument
+    leaq  	-527(%rbp), %rsi    # pass the address in the stack frame of the 1st pstring's string
+    movq  	$0, %rax    # set %rax to 0
+    call  	scanf
 
-movq    	%rsp ,%rbp              # init new stack fergment
+    # getting the 2nd pString
 
+    # getting the length
+    movq    $format_scan_int, %rdi    # pass the proper scan format as the 1st argument
+    leaq  	-272(%rbp), %rsi    # pass the address in the stack frame of the 2nd pstring's length
+    movq  	$0, %rax    # set %rax to 0
+    call  	scanf
+    # getting the string
+    movq  	$format_scan_string, %rdi    # pass the proper scan format as the 1st argument
+    leaq  	-271(%rbp), %rsi    # pass the address in the stack frame of the 2nd pstring's string
+    movq  	$0, %rax    # set %rax to 0
+    call  	scanf
 
-subq    	$528, %rsp              # init 528 bytes in the stack for the next varibales. (to allign the stack by 16)
+    # getting the user's choice
 
+    movq    $format_scan_d, %rdi    # pass the proper scan foramt as the 1st argument
+    leaq  	-16(%rbp), %rsi    # pass the address in the stack frame of the user's choice int
+    movq  	$0, %rax    # set %rax to 0
+    call  	scanf
 
+    # calling run_func in order to perform the user's choice, according to the jump table
+    # xorq    	%rdi,%rdi               # reset rdi (delete garbage from the 4 msb before using rdi)
+    movl    	-16(%rbp),%edi          # passing the choice of the user as an argument to the function
+    leaq    	-528(%rbp), %rsi        # passing a pointer to the 1st pString
+    leaq    	-272(%rbp), %rdx        # passing a Pointer to the 2nd pString
+    call    	run_func
 
-movq  		$format_scan_d, %rdi      # init the format of the input and save in rdi
+    # Clearing the stack frame of the proccess
 
-leaq  		-528(%rbp), %rsi          # change the rsi to the pointer of -528(%rbp)
-
-movq  		$0, %rax
-
-call  		scanf                     # scan the length of the first string
-
-
-
-movq  		$format_scan_s, %rdi      # init the format of the input and save in rdi
-
-leaq  		-527(%rbp), %rsi          # change the rsi to the pointer of -527(%rbp)
-
-movq  		$0, %rax
-
-call  		scanf                     # scan the first string (max size: 255)
-
-
-
-movq  		$format_scan_d, %rdi      # init the format of the input and save in rdi
-
-leaq  		-272(%rbp), %rsi          # change the rsi to the pointer of -272(%rbp)
-
-movq  		$0, %rax
-
-call  		scanf                     # scan the length of the second string
-
-
-
-movq  		$format_scan_s, %rdi      # init the format of the input and save in rdi
-
-leaq  		-271(%rbp), %rsi          # change the rsi to the pointer of -271(%rbp)
-
-movq  		$0, %rax
-
-call  		scanf                     # scan the second string (max size: 255)
-
-
-
-movq  		$format_scan_d, %rdi      # init the format of the input and save in rdi
-
-leaq  		-16(%rbp), %rsi           # change the rsi to the pointer of -16(%rbp)
-
-movq  		$0, %rax
-
-call  		scanf                     # scan the choise from the user (opt in run_main.c)
-
-
-
-xorq    	%rdi,%rdi               # reset rdi (delete garbage from the 4 msb before using rdi)
-
-movl    	-16(%rbp),%edi          # move the 4 bytes from the scanf to rdi (the format is %d so its just 4 bytes)
-
-leaq    	-528(%rbp), %rsi        # save the first pstring to rsi
-
-leaq    	-272(%rbp), %rdx        # save the second pstring to rdx
-
-# call    	run_func
-
-
-
-
-
-movq   		%rbp ,%rsp               # free the stack segment
-
-popq   		%rbp
-
-
-
-ret
+    movq    %rbp ,%rsp
+    popq   	%rbp
+    ret
 
