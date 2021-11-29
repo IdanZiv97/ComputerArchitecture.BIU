@@ -1,6 +1,4 @@
-	# 207631466 Yanir Buznah
-
-# Tests used, 'tests.sh' by Ron Even and me
+	# 318175197 Idan Ziv
 
 .section .rodata
 
@@ -9,10 +7,10 @@
     format_scan_string:   .string "%s"    # format to be passed as the 1st argument for scaning a string
 
 	.text
-	.globl	run_main
-	.type	run_main, @function
+	.global   main
+	.type   main, @function
 
-run_main:
+main:
 
     # create the stack frame for run_main
     pushq    %rbp  
@@ -50,7 +48,7 @@ run_main:
 
     # getting the user's choice
 
-    movq    $format_scan_d, %rdi    # pass the proper scan foramt as the 1st argument
+    movq    $format_scan_int, %rdi    # pass the proper scan foramt as the 1st argument
     leaq  	-16(%rbp), %rsi    # pass the address in the stack frame of the user's choice int
     movq  	$0, %rax    # set %rax to 0
     call  	scanf
