@@ -35,13 +35,6 @@
     test_defaultCase:    .string "default case has been invoked\n"
     
     .text
-    .global    main
-    .type   main, @function
-main:
-    movq    $50, %rdi # pass the user's input
-    call    run_func
-    ret
-
     .global run_func
     .type run_func, @function
 run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2nd pString in %rdx
@@ -52,37 +45,31 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     jmp    *.JUMP_TABLE(,%rbx,8)
 
 .f_pstrlen:
-    movq    $test_pstrlen, %rdi # pass the proper format
-    xorq    %rax, %rax
-    call    printf
-    ret
-    /*
-    ; # creating stack frame - saving the pString pointers
-    ; pushq    %rbp
-    ; movq    %rsp, %rbp
-    ; pushq    %rsi    # saving the 1st pString pointer
-    ; pushq    %rdx    # saving the 2nd pString poiner
+    # creating stack frame - saving the pString pointers
+    pushq    %rbp
+    movq    %rsp, %rbp
+    pushq    %rsi    # saving the 1st pString pointer
+    pushq    %rdx    # saving the 2nd pString poiner
 
-    ; # getting the length of the 1st pString
-    ; leaq    -8(%rbp), %rdi    # send the pointer as the parameter
-    ; call    pstrlen
-    ; movq    %rax, %rsi    # saving the return value in %rsi
+    # getting the length of the 1st pString
+    leaq    -8(%rbp), %rdi    # send the pointer as the parameter
+    call    pstrlen
+    movq    %rax, %rsi    # saving the return value in %rsi
 
-    ; # getting the length of the 2nd pString
-    ; leaq    -16(%rbp), %rdi    # send the pointer as the parameter
-    ; call    pstrlen
-    ; movq    %rax, %rdx    # saving the return value in %rdi
+    # getting the length of the 2nd pString
+    leaq    -16(%rbp), %rdi    # send the pointer as the parameter
+    call    pstrlen
+    movq    %rax, %rdx    # saving the return value in %rdi
 
-    ; # print the message
-    ; movq    $msg_pstrlen, %rdi    # pasing the proper message to printf
-    ; call    printf    # Note: in %rsi and %rdx we saved the return values from calling pstrlen
+    # print the message
+    movq    $msg_pstrlen, %rdi    # pasing the proper message to printf
+    call    printf    # Note: in %rsi and %rdx we saved the return values from calling pstrlen
 
-    ; # resotre the stack frame
-    ; popq    %rdx
-    ; popq    %rsi
-    ; popq    %rbp
-    ; movq    %rbp, %rsp
-    */
+    # resotre the stack frame
+    popq    %rdx
+    popq    %rsi
+    popq    %rbp
+    movq    %rbp, %rsp
     ret
 
 .f_replaceChar:
