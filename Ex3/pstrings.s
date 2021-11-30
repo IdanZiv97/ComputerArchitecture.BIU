@@ -154,4 +154,5 @@ pstrijcmp: # %rdi - pstr1, %rsi - pstr2, %rdx - i, %rcx - j
     leaq (%rdi, %rcx),  %r9 # pstr1 + j
     leaq (%rsi, %rdx),  %r10 # pstr2 + i
     leaq (%rsi, %rcx), %r11 # pstr2 + j
+    ret
     

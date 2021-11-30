@@ -54,8 +54,8 @@ main:
     call  	scanf
 
     # calling run_func in order to perform the user's choice, according to the jump table
-    # xorq    	%rdi,%rdi               # reset rdi (delete garbage from the 4 msb before using rdi)
     movl    	-16(%rbp),%edi          # passing the choice of the user as an argument to the function
+                                        # this way we make sure the upper 32-bit are set to 0
     leaq    	-528(%rbp), %rsi        # passing a pointer to the 1st pString
     leaq    	-272(%rbp), %rdx        # passing a Pointer to the 2nd pString
     call    	run_func
