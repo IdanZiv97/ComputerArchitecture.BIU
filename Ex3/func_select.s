@@ -43,21 +43,7 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     ja    .f_default # if the number is not in range we ha
     jmp    *.JUMP_TABLE(,%rbx,8)
 
-.end_sequence:
-    # restore the data saved to the proper registers
-    movq    -48(%rbp), %rsi
-    movq    -40(%rbp), %rdx
-    # set the old process stack frame
-    addq    $48, %rsp    # deallocate the stack frame
-    movq    %rbp, %rsp
-    popq    %rbp
-    ret
-
 .f_pstrlen:
-    # creating stack frame - saving the pString pointers
-    pushq    %rbp
-    movq    %rsp, %rbp
-
     # getting the length of the 1st pString
     leaq    -48(%rbp), %rdi    # send the pointer as the parameter
     call    pstrlen
@@ -106,7 +92,7 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     incq    %rcx    # 2nd pString - we increment by 1, so we will 'skip' to the start of the string istelf
     xorq    %rax, %rax    # set %rax to 0
     call    printf
-    jmp    end_sequence
+    jmp    .end_sequence
 
 .f_pstrijcpy:
     # get the i index - save on stack
@@ -124,7 +110,7 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     leaq    -48(%rbp), %rdi    # dest - the 1st pString
     leaq    -40(%rbp), %rsi    # src - the 2nd Pstring
     leaq    -32(%rbp), %rdx    # index i
-    leaq    -24(%rbo), %rcx    # index j 
+    leaq    -24(%rbp), %rcx    # index j 
     call    pstrijcpy    # call pstrijcpy
     movq    %rax, -16(%rbp)    # saving the pointer to pString from pstrijcpy
 
@@ -152,21 +138,25 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
 
     # end of the case, initiate end sequence
     jmp    .end_sequence
-    
+
 .f_swapCase:
-    movq    $test_swapCase, %rdi
-    xorq    %rax, %rax
-    call    printf
     ret
 
 .f_pstrijcmp:
-    movq    $test_pstrijcmp, %rdi
-    xorq    %rax, %rax
-    call    printf
     ret
 
 .f_default:
-    movq    $test_defaultCase, %rdi
+    movq    $msg_default_case, %rdi
     xorq    %rax, %rax
     call printf
+    ret
+
+.end_sequence:
+    # restore the data saved to the proper registers
+    movq    -48(%rbp), %rsi
+    movq    -40(%rbp), %rdx
+    # set the old process stack frame
+    addq    $48, %rsp    # deallocate the stack frame
+    movq    %rbp, %rsp
+    popq    %rbp
     ret

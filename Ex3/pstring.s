@@ -175,3 +175,11 @@ pstrijcmp: # %rdi - pstr1, %rsi - pstr2, %rdx - i, %rcx - j
 .pstrijcmp_pstr2isBigger:
     movq    $-1, %rax
     ret
+
+.pstrijcmp_invalidInput:
+    pushq    %rdi
+    movq    $format_invalidInput, %rdi    # pass proper format for printf
+    xorq    %rax, %rax    # set %rax to 0
+    call    printf
+    popq    %rdi
+    ret
