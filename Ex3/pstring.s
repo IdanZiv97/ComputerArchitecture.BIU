@@ -19,16 +19,16 @@ replaceChar: # %rdi- pointer to pstring, %rsi - oldChar, %rdx - new char
     movq    %rdi, %rax    # setting the return value to be the pointer we are working with
     # create a pointer to the end of the string
     movzbq    (%rdi), %r9     # saving the size of the pString
-    leaq    (%rdi, %r9), %r10    # creating a pointer to the end of the string
+    leaq    (%rdi, %r9), %rdi    # creating a pointer to the end of the string
     # starting from the end of the string, all the way down
     # when we reach to the address of the size we will stop (since we covered the whole string)
 .replaceChar_doWhile:
-    cmpb    (%r10), %sil    # check if the current char in the string equals to the oldChar (which is save as a byte)
+    cmpb    (%rdi), %sil    # check if the current char in the string equals to the oldChar (which is save as a byte)
     jne    .replaceChar_goToNextChar    # if there is no match - go check the next char
-    movb    %dl, (%r10)    # write the newChar instead of the oldChar
+    movb    %dl, (%rdi)    # write the newChar instead of the oldChar
 .replaceChar_goToNextChar:
-    decq    %r10    # == pstr--
-    cmpq    %r10, %rax    # check if we reached the end r10 > rax
+    decq    %rdi    # == pstr--
+    cmpq    %rdi, %rax    # check if we reached the end r10 > rax
     jl    .replaceChar_doWhile    # continue the loop
     ret
 

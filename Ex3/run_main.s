@@ -1,7 +1,6 @@
 	# 318175197 Idan Ziv
 
 .section .rodata
-    .extern run_func
     .align 8
     format_scan_int:    .string "%d"    # format to be passed as the 1st argument for scaning an int
     format_scan_string:   .string "%s"    # format to be passed as the 1st argument for scaning a string

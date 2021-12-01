@@ -14,3 +14,6 @@ pstring.o: pstring.s
 
 clean:
 	rm -rf *.o a.out
+	rm dump.txt
+dump:
+	objdump -d a.out > dump.txt

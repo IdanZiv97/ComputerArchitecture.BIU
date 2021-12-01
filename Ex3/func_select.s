@@ -64,44 +64,53 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     # Jump to end sequence to deallocate the stack frame
     jmp    .end_sequence
 
-.f_replaceChar    
+.f_replaceChar:
+    # allocate memory for the two chars on the stack - 1-byte * 2
+    subq    $16, %rsp    # this makes rsp as the offset, subtracted 16 in order to keep the alignment
+    
+    # push the pointers to the stack
+    pushq    %rdx    # pointer to the 2nd pString
+    pushq    %rsi    # pointer to the 1st pString
+    
     # scan the oldChar
-    movq    $format_scan_char, %rdi    # pass the proper scanf format
-    leaq    -32(%rbp), %rsi    # we save the char in the stack frame for later use
-    xorq    %rax, %rax    # set %rax to 0
-    call    scanf
-    # scan the newChar - save them both on the stack since we need them throuhgout the case
-    movq    $format_scan_char, %rdi    # pass the proper scanf format
-    leaq    -24(%rbp),  %rsi    # we save the char in the stack frame for later use
+    movq    $format_scan_char, %rdi    # pass the proper scan format
+    leaq    16(%rsp), %rsi    # oldChar will be saved on the stack
     xorq    %rax, %rax    # set %rax to 0
     call    scanf
 
-    # calling replaceChar with the 1st pString
+    # scan the newChar
+    movq    $format_scan_char, %rdi    # pass the proper scan format
+    leaq    17(%rsp), %rsi    # newChar will be saved on the stack
+    xorq    %rax, %rax    # set %rax to 0
+    call    scanf
 
-    leaq    -48(%rbp), %rdi    # load 1st pString to replaceChar as argument
-    movzbq    -32(%rbp), %rsi    # passing the oldChar as argument (it is a byte so we pad the rest of the bits with 0's)
-    movzbq    -24(%rbp), %rdx    # passing the newChar as argument (it is a byte so we pad the rest of the bits with 0's)
+    # call replaceChar on the 1st pString
+    popq    %rdi    # the pointer to the 1st pString
+    movq    %rdi, %r12    # create a copy of the pointer for later use
+    leaq    8(%rsp), %rsi    # pass oldChar as an argument to replaceChar
+    leaq    9(%rsp), %rdx    # pass newChar as an argument to replaceChar    
     call    replaceChar
-    movq    %rax, -8(%rbp)    # save the pString that was returned
-                          # Note: It is saved in %rcx because it will be used as a 3rd argument to printf
-    # calling replaceChar with the 2nd pString
 
-    leaq    -40(%rbp), %rdi    # load 2nd pString to replaceChar as argument
-    movzbq    -32(%rbp), %rsi    # passing the oldChar as argument (it is a byte so we pad the rest of the bits with 0's)
-    movzbq    -24(%rbp), %rdx    # passing the newChar as argument (it is a byte so we pad the rest of the bits with 0's)
+    # call replace char on the 2nd pString
+    popq    %rdi    # the pointer to the 2nd pString, the are now in of set of 0,1
+    movq    %rdi, %r14    # create a copy of the pointer for later use
+    leaq    (%rsp), %rsi    # pass oldChar as an argument to replaceChar
+    leaq    1(%rsp), %rdx    # pass newChar as an argument to replaceChar
     call    replaceChar
-    movq    %rax, %r8    # save the pString that was returned
-                         # Note: It is saved in %r8 because it will be used as a 4th argument to printf
 
-    # printing the result of the case
-    movq    $msg_replaceChar, %rdi    # pass the proper printf fomrat
-    movzbq    -32(%rbp), %rsi     # pass the oldChar
-    movzbq    -24(%rbp), %rdx
-    movq    -8(%rbp), %rcx
+    # printing the result
+    movq    $msg_replaceChar, %rdi    # pass the proper format for printf
+    movzbq    (%rsp), %rsi    # pass the oldChar
+    movzbq    1(%rsp), %rdx    # pass the newChar
+    # pass the pointer, recall they must be adjusted to the start of the string itself
+    movq    %r12, %rcx    # 1st pString pointer
     incq    %rcx
+    movq    %r14, %r8     # 2nd pString pointer
     incq    %r8
-    call    printf    # the pointers to the strings are already save properly
-    jmp    .end_sequence
+    xorq    %rax, %rax    # set %rax to 0
+    call    printf
+    ret
+
 
 .f_pstrijcpy:
     # get the i index - save on stack
