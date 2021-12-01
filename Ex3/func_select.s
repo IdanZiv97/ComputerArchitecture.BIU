@@ -26,14 +26,6 @@
     format_scan_char:    .string    " %c"
     format_scan_string:    .string    " %s"
 
-    # literal for jump table tests
-    test_pstrlen:    .string    "pstrlen case has been invoked\n"
-    test_replaceChar:    .string    "replaceChar case has been invoked\n"
-    test_pstrijcpy:    .string    "pstrijcpy case has been invoked\n"
-    test_swapCase:    .string    "swapCase case has been invoked\n"
-    test_pstrijcmp:    .string    "pstrijcmp case has been invoked\n"
-    test_defaultCase:    .string    "default case has been invoked\n"
-    
     .text
     .global run_func
     .type run_func, @function
@@ -101,7 +93,7 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     movq    %rax, %r8    # save the pointer to the new pString from replaceChar
                          # %r8 will later be used to pass the pointer to printf
     # init replaceChar on 2nd pString
-    leaq    -40(%rbp), %rdi    # pass the pointer to 1stPstring
+    leaq    -40(%rbp), %rdi    # pass the pointer to 2stPstring
     leaq    -32(%rbp), %rsi    # pass the oldChar
     leaq    -24(%rbp), %rdx    # pass the newChar
     call    replaceChar
@@ -117,11 +109,50 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     jmp    end_sequence
 
 .f_pstrijcpy:
-    movq    $test_pstrijcpy, %rdi
-    xorq    %rax, %rax
-    call printf
-    ret
+    # get the i index - save on stack
+    movq    $format_scan_int, %rdi    # pass the proper format to scanf
+    leaq    -32(%rbp), %rsi    # pass the address of i
+    xorq    %rax, %rax    # set %rax to 0
+    call    scanf
+    # movq    %rax, %rdx    # saving the the index 
+    # get the j index - save on stack
+    leaq    -24(%rbp), %rsi   # pass the address of j, note that the correct format is in %rdi
+    xorq    %rax, %rax    # set %rax to 0
+    call    scanf
+    # movq    %rax, %rcx
+    # prep parameters to pstrijcpy
+    leaq    -48(%rbp), %rdi    # dest - the 1st pString
+    leaq    -40(%rbp), %rsi    # src - the 2nd Pstring
+    leaq    -32(%rbp), %rdx    # index i
+    leaq    -24(%rbo), %rcx    # index j 
+    call    pstrijcpy    # call pstrijcpy
+    movq    %rax, -16(%rbp)    # saving the pointer to pString from pstrijcpy
 
+    # print the pStrings by the proper format
+    
+    # 1st pString - destination (actually the new pString)
+    movq    -16(%rbp), %rdi    
+    call    pstrlen    # calculating the legth of the pString
+    movq    %rax, %rsi    # will be used later when calling for printf
+    movq    -16(%rbp), %rdx    # passing the pointer of the pString for printf
+    incq    %rdx    # adjusting the pointer to the string part of the pString
+    movq    $format_pstr_info, %rdi    # passing the proper format for prtinf
+    xorq    %rax, %rax  # set %rax to 0
+    call    printf
+
+    # 2nd pString - src (the 2nd pString)
+    movq    -40(%rbp), %rdi
+    call    pstrlen    # calculating the length of the pString
+    movq    %rax, %rsi    # will be used later when calling for printf
+    movq    -40(%rbp), %rdx     # passing the pointer to the pString as a parameter to printf
+    incq    %rdx    # adjusting the pointer to the string part of the string
+    movq    $format_pstr_info, %rdi    # passing the proper format to printf
+    xorq    %rax, %rax  # set %rax to 0
+    call printf
+
+    # end of the case, initiate end sequence
+    jmp    .end_sequence
+    
 .f_swapCase:
     movq    $test_swapCase, %rdi
     xorq    %rax, %rax
