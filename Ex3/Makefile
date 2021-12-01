@@ -1,8 +1,16 @@
-run1: clean
-	gcc -ggdb -no-pie -o run1 pstrings.s func_select.s run_main.s
+a.out: main.o run_main.o func_select.o pstring.o
+	gcc -g -o a.out main.o run_main.o func_select.o pstring.o
+main.o: main.c pstring.h
+	gcc -g -c -o main.o main.c
 
-all: clean
-	gcc -ggdb -no-pie -o func_select func_select.s
+run_main.o: run_main.s pstring.h
+	gcc -g -c -o run_main.o run_main.s
+
+func_select.o: func_select.s pstring.h
+	gcc -g -c -o func_select.o func_select.s
+
+pstring.o: pstring.s
+	gcc -g -c -o pstring.o pstring.s
 
 clean:
-	rm -rf *.o run1
+	rm -rf *.o a.out
