@@ -8,39 +8,28 @@
     .type pstrlen, @function
 pstrlen: # the pstring address is saved on %rdi
     # There is no need to create a stack frame, since we are not using any local vars
-    movq (%rdi), %rax # the length of the pstring is the on the first address of the pstring
+    movzbq (%rdi), %rax # the length of the pstring is the on the first address of the pstring
     ret
 
     .global replaceChar
     .type replaceChar, @function
-replaceChar: # %rdi- pointer to pstring, %rsi oldChar, %rdx - new char
-    # save the old frame base pointer
-    pushq %rbp
-    movq %rsp, %rbp 
-
-    # the function returns the pointer to the pstring
-    movq %rdi, %rax # saving the pointer to the start of the pstring, this way we can manipulate it and still have a pointer
-    addq $1, %rdi # the first byte of the struct is saved for the lenght, we want to start form the string itself
-    # do while loop
-.replaceChar_while:
-    cmpb $0, (%rdi) # check if we reached '\0'
-    je .end_replaceChar # pstr[i] == '\0' - reached the end of the string, end loop
-    # we need to check if the char is valid
-    cmpb (%rdi), %sil # check if pstr[i] == oldChar
-    je .replaceChar_if
-    addq $1, %rdi # pstr++
-    jmp .replaceChar_while
-
-.replaceChar_if:
-    # we found the old char, we need to rewirte it with the new char
-    movb %dl, (%rdi)
-    addq $1, %rdi
-    jmp .replaceChar_while
-
-.end_replaceChar:
-    # restore the stack pointers
-    movq %rbp, %rsp
-    pop %rbp
+replaceChar: # %rdi- pointer to pstring, %rsi - oldChar, %rdx - new char
+    # Note: we are changing the pString itself, so we don't create a new pString,
+    #       but we return the same pointer that we got
+    movq    %rdi, %rax    # setting the return value to be the pointer we are working with
+    # create a pointer to the end of the string
+    movzbq    (%rdi), %r9     # saving the size of the pString
+    leaq    (%rdi, %r9), %r10    # creating a pointer to the end of the string
+    # starting from the end of the string, all the way down
+    # when we reach to the address of the size we will stop (since we covered the whole string)
+.replaceChar_doWhile:
+    cmpb    (%r10), %sil    # check if the current char in the string equals to the oldChar (which is save as a byte)
+    jne    .replaceChar_goToNextChar    # if there is no match - go check the next char
+    movb    %dl, (%r10)    # write the newChar instead of the oldChar
+.replaceChar_goToNextChar:
+    decq    %r10    # == pstr--
+    cmpq    %r10, %rax    # check if we reached the end r10 > rax
+    jl    .replaceChar_doWhile    # continue the loop
     ret
 
     .global pstrijcpy

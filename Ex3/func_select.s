@@ -64,37 +64,43 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     # Jump to end sequence to deallocate the stack frame
     jmp    .end_sequence
 
-.f_replaceChar:
-    # scan and save the oldCahr
-    movq    $format_scan_char, %rdi    # pass the proper format
-    leaq    -32(%rbp), %rsi    # pass the address of oldChar
+.f_replaceChar    
+    # scan the oldChar
+    movq    $format_scan_char, %rdi    # pass the proper scanf format
+    leaq    -32(%rbp), %rsi    # we save the char in the stack frame for later use
     xorq    %rax, %rax    # set %rax to 0
     call    scanf
-    # scan and save the newChar
-    leaq    -24(%rbp), %rsi     # pass the address of oldChar, note that the format hasn't changed
-    xorq    %rax, %rax
-    call    scanf
-    # init repalceChar on 1st pString
-    leaq    -48(%rbp), %rdi    # pass the pointer to 1stPstring
-    leaq    -32(%rbp), %rsi    # pass the oldChar
-    leaq    -24(%rbp), %rdx    # pass the newChar
-    call    replaceChar
-    movq    %rax, %r8    # save the pointer to the new pString from replaceChar
-                         # %r8 will later be used to pass the pointer to printf
-    # init replaceChar on 2nd pString
-    leaq    -40(%rbp), %rdi    # pass the pointer to 2stPstring
-    leaq    -32(%rbp), %rsi    # pass the oldChar
-    leaq    -24(%rbp), %rdx    # pass the newChar
-    call    replaceChar
-    movq    %rax, %rcx    # save the pointer to the new pString from replaceChar
-    # set the arguments and format to pString
-    movq    $msg_replaceChar, %rdi    # foramt
-    leaq    -32(%rbp),  %rsi    # oldChar
-    leaq    -24(%rbp),  %rdx    # newChar
-    incq    %r8    # 1st pString - we increment by 1, so we will 'skip' to the start of the string itself
-    incq    %rcx    # 2nd pString - we increment by 1, so we will 'skip' to the start of the string istelf
+    # scan the newChar - save them both on the stack since we need them throuhgout the case
+    movq    $format_scan_char, %rdi    # pass the proper scanf format
+    leaq    -24(%rbp),  %rsi    # we save the char in the stack frame for later use
     xorq    %rax, %rax    # set %rax to 0
-    call    printf
+    call    scanf
+
+    # calling replaceChar with the 1st pString
+
+    leaq    -48(%rbp), %rdi    # load 1st pString to replaceChar as argument
+    movzbq    -32(%rbp), %rsi    # passing the oldChar as argument (it is a byte so we pad the rest of the bits with 0's)
+    movzbq    -24(%rbp), %rdx    # passing the newChar as argument (it is a byte so we pad the rest of the bits with 0's)
+    call    replaceChar
+    movq    %rax, -8(%rbp)    # save the pString that was returned
+                          # Note: It is saved in %rcx because it will be used as a 3rd argument to printf
+    # calling replaceChar with the 2nd pString
+
+    leaq    -40(%rbp), %rdi    # load 2nd pString to replaceChar as argument
+    movzbq    -32(%rbp), %rsi    # passing the oldChar as argument (it is a byte so we pad the rest of the bits with 0's)
+    movzbq    -24(%rbp), %rdx    # passing the newChar as argument (it is a byte so we pad the rest of the bits with 0's)
+    call    replaceChar
+    movq    %rax, %r8    # save the pString that was returned
+                         # Note: It is saved in %r8 because it will be used as a 4th argument to printf
+
+    # printing the result of the case
+    movq    $msg_replaceChar, %rdi    # pass the proper printf fomrat
+    movzbq    -32(%rbp), %rsi     # pass the oldChar
+    movzbq    -24(%rbp), %rdx
+    movq    -8(%rbp), %rcx
+    incq    %rcx
+    incq    %r8
+    call    printf    # the pointers to the strings are already save properly
     jmp    .end_sequence
 
 .f_pstrijcpy:
