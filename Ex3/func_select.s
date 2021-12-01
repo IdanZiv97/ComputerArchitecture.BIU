@@ -3,17 +3,17 @@
 
     .align 8
 .JUMP_TABLE:    # cases for switch case
-    .quad   .f_pstrlen    #case 50
-    .quad   .f_default    #case 51 - default
-    .quad   .f_replaceChar    #case 52
-    .quad   .f_pstrijcpy    #case 53
-    .quad   .f_swapCase    #case 54
-    .quad   .f_pstrijcmp    #case 55
-    .quad   .f_default    #case 56 - default 
-    .quad   .f_default    #case 57 - default
-    .quad   .f_default    #case 58 - default
-    .quad   .f_default    #case 59 - default
-    .quad   .f_pstrlen    #case 60
+    .quad   .f_pstrlen    # case 50
+    .quad   .f_default    # case 51 - default
+    .quad   .f_replaceChar    # case 52
+    .quad   .f_pstrijcpy    # case 53
+    .quad   .f_swapCase    # case 54
+    .quad   .f_pstrijcmp    # case 55
+    .quad   .f_default    # case 56 - default 
+    .quad   .f_default    # case 57 - default
+    .quad   .f_default    # case 58 - default
+    .quad   .f_default    # case 59 - default
+    .quad   .f_pstrlen    # case 60
 
     # literals for pstr.h functions
     msg_pstrlen:     .string    "first pstring length: %d,second pstring length: %d\n"
@@ -45,18 +45,21 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
 
 .f_pstrlen:
     # getting the length of the 1st pString
-    leaq    -48(%rbp), %rdi    # send the pointer as the parameter
+    movq    %rsi, %rdi    # send the pointer as the parameter
     call    pstrlen
-    movq    %rax, %rsi    # saving the return value in %rsi
+    movq    %rax, -32(%rbp)    # saving the return value from pstrlen to the stack
 
     # getting the length of the 2nd pString
-    leaq    -40(%rbp), %rdi    # send the pointer as the parameter
+    movq    %rdx, %rdi    # send the pointer as the parameter
     call    pstrlen
-    movq    %rax, %rdx    # saving the return value in %rdi
+    movq    %rax, -24(%rbp)    # saving the return value from pstrlen to the stack
 
     # print the message
     movq    $msg_pstrlen, %rdi    # pasing the proper message to printf
-    call    printf    # Note: in %rsi and %rdx we saved the return values from calling pstrlen
+    movl    -32(%rbp), %esi    # passing the length of the 1st pString
+    movl    -24(%rbp), %edx    # passing the length of the 2nd pString
+    xorq    %rax, %rax    # set %rax to 0
+    call    printf
 
     # Jump to end sequence to deallocate the stack frame
     jmp    .end_sequence
