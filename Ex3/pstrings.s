@@ -138,7 +138,7 @@ swapCase: # %rdi - *pstr
 pstrijcmp: # %rdi - pstr1, %rsi - pstr2, %rdx - i, %rcx - j
     # check for valid indexes
     # test for i < pstr1.length
-    cmpb (%rdi),    %dl
+    cmpb (%rdi), %dl
     ja .pstrijcmp_invalidInput    # if not - invalid input
     # test for j < pstr1.length
     cmpb (%rdi),    %cl
@@ -149,10 +149,29 @@ pstrijcmp: # %rdi - pstr1, %rsi - pstr2, %rdx - i, %rcx - j
     # test for j < pstr2.length
     cmpb (%rsi),    %cl
     ja .pstrijcmp_invalidInput    # if not - invalid input
+.pstrijcmp_loop:
     # creating pointers to the right sections of each pstr
     leaq (%rdi, %rdx),  %r8 # pstr1 + i
     leaq (%rdi, %rcx),  %r9 # pstr1 + j
     leaq (%rsi, %rdx),  %r10 # pstr2 + i
-    leaq (%rsi, %rcx), %r11 # pstr2 + j
+    # comapre the pstr1[i] to pstr2[i]
+    movb    (%r8), %r11b    # can't access memory to memory 
+    cmpb    %r11b, (%r10)   
+    ja    .pstrijcmp_pstr2isBigger
+    jb    .pstrijcmp_pstr1isBigger
+    incq    %r8    # pstr1[i++]
+    incq    %r10    # pstr2[i++]
+    # check if the address of the pstr[i] != pstr[j]
+    cmpq    %r8, %r9
+    jle    .pstrijcmp_loop # haven't reached the end of the range
+    # In the case the ranges are equal
+    movq    $0, %rax
     ret
-    
+
+.pstrijcmp_pstr1isBigger:
+    movq    $1, %rax
+    ret
+
+.pstrijcmp_pstr2isBigger:
+    movq    $-1, %rax
+    ret
