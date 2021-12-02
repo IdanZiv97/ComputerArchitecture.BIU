@@ -16,11 +16,11 @@
     .quad   .f_pstrlen    # case 60
 
     # literals for pstr.h functions
-    msg_pstrlen:     .string    "first pstring length: %d,second pstring length: %d\n"
+    msg_pstrlen:     .string    "first pstring length: %d, second pstring length: %d\n"
     msg_replaceChar:    .string    "old char: %c, new char: %c, first string: %s, second string: %s\n"
-    format_pstr_info:   .string    "lenght: %d, string: %s\n"
-    msg_pstrijcmp:    .string    "comapre result: %d\n"
-    msg_default_case:    .string    "invalid option\n"
+    format_pstr_info:   .string    "length: %d, string: %s\n"
+    msg_pstrijcmp:    .string    "compare result: %d\n"
+    msg_default_case:    .string    "invalid option!\n"
     # literals for scanf, printf
     format_scan_int:     .string    " %d"
     format_scan_char:    .string    " %c"
@@ -106,6 +106,9 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     xorq    %rax, %rax    # set %rax to 0
     call    printf
     # restoring the stack frame
+    addq    $1, %rsp
+    popq    %rbp
+    movq    %rbp, %rsp
     jmp    .end_sequence
 
 
