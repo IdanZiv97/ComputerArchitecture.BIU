@@ -162,7 +162,32 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     jmp    .end_sequence
 
 .f_swapCase:
-    ret
+    # save the pointer of 2nd pString (%rdx)
+    pushq    %rdx
+    movq    %rsi, %rdi    # pass 1st pString to swapCase
+    call    swapCase
+
+    # print result of swapCase for 1st pString
+    movq    $format_pstr_info, %rdi    # pass the proper format
+    movzbq    (%rax), %rsi    # pass the pstr's length as argument
+    incq    %rax    # adjust pointer to string part
+    movq    %rax, %rdx    # pass the pstr's string as argument
+    xorq    %rax, %rax    # set %rax to 0
+    call    printf
+
+    # call swapCase on 2nd pString
+    popq    %rdi    # pass 2nd pString to swapCase
+    call    swapCase
+    
+    # print result of swapCase on 2nd pString
+    movq    $format_pstr_info, %rdi
+    movzbq     (%rax), %rsi    # pass pstr's lenght as argument
+    incq    %rax    # adjust pointer to string part
+    movq    %rax, %rdx     # pass the pstr's string as argument
+    xorq    %rax, %rax    # set %rax to 0
+    call printf
+
+    jmp    .end_sequence
 
 .f_pstrijcmp:
     ret
