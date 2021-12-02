@@ -159,6 +159,8 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     movq    %r11, %rdx    # passing the pointer to the string to %rdx
     xorq    %rax, %rax    # set %rax to 0
     call    printf
+    movq    %rbp, %rsp
+    popq    %rbp
     jmp    .end_sequence
 
 .f_swapCase:
