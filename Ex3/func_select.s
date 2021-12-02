@@ -1,7 +1,7 @@
 # 318175197 Idan Ziv
     .section    .rodata
-
     .align 8
+
 .JUMP_TABLE:    # cases for switch case
     .quad   .f_pstrlen    # case 50
     .quad   .f_default    # case 51 - default
@@ -37,7 +37,7 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     leaq    -50(%rdi), %rbx # setting the choice to match the range
     cmpq    $10, %rbx # check if the choice is in range
     ja    .f_default # if the number is not in range we ha
-    jmp    *.JUMP_TABLE(,%rbx,8)
+    jmp    *.JUMP_TABLE(,%rbx,8)    # jump to the proper case
 
 .f_pstrlen:
     # getting the length of the 1st pString
@@ -114,7 +114,7 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     movq    %rsp, %rbp
     # save the stack frame, create room for 
     subq    $8, %rsp    # room for 2 ints from the user, using 16 to keep the alignmet of the stack pointer
-                         # as a multiple of 16
+                        # as a multiple of 16
      # save the pointers to the strings
     pushq    %rdx    # pointer to the 2nd pString
     pushq    %rsi    # pointer to the 1st pString
@@ -159,6 +159,8 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     movq    %r13, %rdx    # passing the pointer to the string to %rdx
     xorq    %rax, %rax    # set %rax to 0
     call    printf
+
+    # reallocating data
     movq    %rbp, %rsp
     popq    %rbp
     jmp    .end_sequence
@@ -185,7 +187,7 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     movq    $format_pstr_info, %rdi
     movzbq     (%rax), %rsi    # pass pstr's lenght as argument
     incq    %rax    # adjust pointer to string part
-    movq    %rax, %rdx     # pass the pstr's string as argument
+    movq    %rax, %rdx    # pass the pstr's string as argument
     xorq    %rax, %rax    # set %rax to 0
     call printf
 
@@ -234,10 +236,10 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
 
 
 .f_default:
-    movq    $msg_default_case, %rdi
-    xorq    %rax, %rax
+    movq    $msg_default_case, %rdi    # pass the proper format for printf
+    xorq    %rax, %rax    # set %rax to 0
     call printf
-    jmp    .end_sequence
+    jmp    .end_sequence   # restore the stack frame
 
 .end_sequence:
     # restore stack frame

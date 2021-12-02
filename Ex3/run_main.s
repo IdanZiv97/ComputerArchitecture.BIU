@@ -1,6 +1,6 @@
-	# 318175197 Idan Ziv
+# 318175197 Idan Ziv
 
-.section .rodata
+    .section .rodata
     .align 8
     format_scan_int:    .string "%d"    # format to be passed as the 1st argument for scaning an int
     format_scan_string:   .string "%s"    # format to be passed as the 1st argument for scaning a string
@@ -8,7 +8,6 @@
 	.text
 	.global   run_main
 	.type   run_main, @function
-
 run_main:
 
     # create the stack frame for run_main
@@ -53,11 +52,11 @@ run_main:
     call  	scanf
 
     # calling run_func in order to perform the user's choice, according to the jump table
-    movl    	-16(%rbp),%edi          # passing the choice of the user as an argument to the function
-                                        # this way we make sure the upper 32-bit are set to 0
-    leaq    	-528(%rbp), %rsi        # passing a pointer to the 1st pString
-    leaq    	-272(%rbp), %rdx        # passing a Pointer to the 2nd pString
-    call    	run_func
+    movl    -16(%rbp), %edi    # passing the choice of the user as an argument to the function
+                               # this way we make sure the upper 32-bit are set to 0
+    leaq    -528(%rbp), %rsi    # passing a pointer to the 1st pString
+    leaq    -272(%rbp), %rdx    # passing a Pointer to the 2nd pString
+    call    run_func
 
     # Clearing the stack frame of the proccess
 
