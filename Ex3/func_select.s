@@ -137,7 +137,7 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     movq    %rdi, %r12    # save a copy for later use (printing the case message)
     popq    %rsi    # 1st pString is the second element and is the src argument.
                     # reduce the offset of the stack by 8
-    movq    %rsi, %r11    # save a copy for later use (printing the case message)
+    movq    %rsi, %r13    # save a copy for later use (printing the case message)
     movl    (%rsp), %edx    # passing the index i
     movl    4(%rsp), %ecx    # passing the index j
     call    pstrijcpy
@@ -148,15 +148,15 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     incq    %r12    # adjusting the pointer to string part
     movq    %r12, %rdx    # passing the pointer to the string to %rdx
     xorq    %rax, %rax    # set %rax to 0
-    pushq   %r11    # cahgnes in printf
+    pushq   %r11    # to keep the stack pointer alignmet
     call    printf
     popq    %r11
 
     # printing the 2nd pString - dest
     movq    $format_pstr_info, %rdi    # pass the proper format for printf
-    movzbq    (%r11), %rsi    # passing the length of the pString to %rsi
-    incq    %r11    # adjusting the pointer to string part
-    movq    %r11, %rdx    # passing the pointer to the string to %rdx
+    movzbq    (%r13), %rsi    # passing the length of the pString to %rsi
+    incq    %r13    # adjusting the pointer to string part
+    movq    %r13, %rdx    # passing the pointer to the string to %rdx
     xorq    %rax, %rax    # set %rax to 0
     call    printf
     movq    %rbp, %rsp
