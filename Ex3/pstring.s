@@ -83,41 +83,39 @@ pstrijcpy: # %rdi - dst, %rsi - src, %rdx -i, %rcx - j
     .global swapCase
     .type swapCase, @function
 swapCase: # %rdi - *pstr
-    # create a pointer to the end
-    movq (%rdi), %rsi
-    leaq (%rdi, %rsi),  %r8 # the end of the str 
+    movq    %rdi, %rax    # save the original pointer as the return value
+    # adjust the pointer to the string part
+    incq    %rdi    # pstr++ 
 .swapCase_checkChar: # checking if the value of the current char is in a proper range
     # check if pstr[i] < 65 or pstr[i] > 122 - if so it is not a char
-    cmpb $65,   (%r8) # ?: pstr[i] >= 65
+    cmpb $65,   (%rdi) # ?: pstr[i] >= 65
     jl .swapCase_nextChar
-    cmpb $122, (%r8) # ?: pstr[i] <= 122
+    cmpb $122, (%rdi) # ?: pstr[i] <= 122
     ja .swapCase_nextChar
     # check if an upper case
-    cmpb $90, (%r8) # ?: pstr[i] <= 90
+    cmpb $90, (%rdi) # ?: pstr[i] <= 90
     jb .swapCase_isUpperCase
     # check if in the range between upper and lower case
-    cmpb $97, (%r8) # ?: pstr[i] < 97
+    cmpb $97, (%rdi) # ?: pstr[i] < 97
     jb .swapCase_nextChar
     # check if a lower case
-    cmpb $122, (%r8)
+    cmpb $122, (%rdi)
     jb .swapCase_isLowerCase
 
 .swapCase_nextChar:
-    decq %r8 # pstr--
+    incq %rdi # pstr++
     # check if we reached the begining
-    cmpq %rdi, %r8
-    jl .swapCase_checkChar # if it not less we haven't finished - go back to the loop
-    # set the return value
-    movq %rdi, %rax
+    cmpq $0, (%rdi)    # check if pstr[i] == '\0'
+    jne .swapCase_checkChar # if it not we haven't finished - go back to the loop
     ret
 .swapCase_isUpperCase:
     # add '32' to the value - the difference between the ASCII value of upper and lower case is 32
-    add $32, (%r8)
+    addq $32, (%rdi)
     # go next char
     jmp .swapCase_nextChar
 .swapCase_isLowerCase:
     # subtract '32' to the value - the difference between the ASCII value of upper and lower case is 32
-    sub $32, (%r9)
+    subq $32, (%rdi)
     # go next char
     jmp .swapCase_nextChar
 
