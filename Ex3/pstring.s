@@ -130,9 +130,9 @@ pstrijcmp: # %rdi - pstr1, %rsi - pstr2, %rdx - i, %rcx - j
     cmpb    $0, %dl    # check if i < 0
     jl    .pstrijcmp_invalidInput
     cmpb    (%rdi), %dl    # check if j > dst.len
-    jg    .pstrijcmp_invalidInput
+    jge   .pstrijcmp_invalidInput
     cmpb    (%rsi), %cl    # check if j > src.len
-    jg    .pstrijcmp_invalidInput
+    jge   .pstrijcmp_invalidInput
 
     # If input is valid, create pointers
     incq    %rdi    # adjust pointer to the string part
