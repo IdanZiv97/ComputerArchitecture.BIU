@@ -84,6 +84,7 @@ pstrijcpy: # %rdi - dst, %rsi - src, %rdx -i, %rcx - j
     .type swapCase, @function
 swapCase: # %rdi - *pstr
     movq    %rdi, %rax    # save the original pointer as the return value
+    movzbq    (%rdi), %rbx    # set up counter = pstr.len
     # adjust the pointer to the string part
     incq    %rdi    # pstr++ 
 .swapCase_checkChar: # checking if the value of the current char is in a proper range
@@ -103,9 +104,10 @@ swapCase: # %rdi - *pstr
     jb .swapCase_isLowerCase
 
 .swapCase_nextChar:
-    incq %rdi # pstr++
+    incq    %rdi # pstr++
+    subb    $1, %bl    # counter--
     # check if we reached the begining
-    cmpq $0, (%rdi)    # check if pstr[i] == '\0'
+    cmpb $0, %bl    # check if counter == 0
     jne .swapCase_checkChar # if it not we haven't finished - go back to the loop
     ret
 .swapCase_isUpperCase:
