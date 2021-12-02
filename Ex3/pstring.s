@@ -22,6 +22,7 @@ replaceChar: # %rdi- pointer to pstring, %rsi - oldChar, %rdx - new char
     leaq    (%rdi, %r9), %rdi    # creating a pointer to the end of the string
     movb    (%rsi), %r10b    # Note: we have pointers to chars saved in the memory, so we need to derefernce
     movb    (%rdx), %r11b    # them in order to perfom the comparisons and rewrites
+    
     # starting from the end of the string, all the way down
     # when we reach to the address of the size we will stop (since we covered the whole string)
 .replaceChar_doWhile:
