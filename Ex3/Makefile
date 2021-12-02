@@ -12,6 +12,11 @@ func_select.o: func_select.s pstring.h
 pstring.o: pstring.s
 	gcc -g -no-pie -c -o pstring.o pstring.s
 
+tests:
+	gcc -g -no-pie main.c run_main.s func_select.s pstring.s
+	chmod +x tests.sh
+	./tests.sh
+
 clean:
 	rm -rf *.o a.out
 	rm dump.txt
