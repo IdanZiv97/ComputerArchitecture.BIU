@@ -43,50 +43,41 @@ replaceChar: # %rdi- pointer to pstring, %rsi - oldChar, %rdx - new char
     .global pstrijcpy
     .type pstrijcpy, @function
 pstrijcpy: # %rdi - dst, %rsi - src, %rdx -i, %rcx - j
-    # save the old frame base pointer and, set new one
-    pushq %rbp
-    movq %rsp,      %rbp
-    # Check for proper range
-    # test for i < des.length
-    cmpb (%rdi),    %dl
-    ja .pstrijcpy_invalidInput    # if not - invalid input
-    # test for j < det.length
-    cmpb (%rdi),    %cl
-    ja .pstrijcpy_invalidInput    # if not - invalid input
-    # test for i < src.length
-    cmpb (%rsi),    %dl
-    ja .pstrijcpy_invalidInput    # if not - invalid input
-    # test for j < src.length
-    cmpb (%rsi),    %cl
-    ja .pstrijcpy_invalidInput    # if not - invalid input
-    # first update the pointers - dealing with addresses
-    leaq (%rsi, %rdx),      %r8    # src -> src + i
-    leaq (%rdi, %rdx),      %r9    # dst -> dst + i
-    leaq (%rsi, %rcx),      %r10    # src -> src +j: as an end mark to the end of the copy process
-    # do while:
-.pstrijcpy_while:
-    # copy the char - two steps since you cant mov form memory to memory
-    movb (%r8),     %r11b
-    movb %r11b,     (%r9)  
-    # increase the pointers
-    addq $1,     %r8
-    addq $1,     %r9
-    # check to see if we reached the end
-    cmpq %r8,    %r10
-    jne .pstrijcpy_while # if not continue the loop
-    # end of the liip
-    leave
-    movq %rdi,  %rax
+    pushq   %r11
+    movq    %rdi, %rax
+    # check the input
+    cmpl %edx, %ecx    # check if i > j
+    jl    .pstrijcpy_invalidInput
+    cmpb    $0, %dl    # check if i < 0
+    jl    .pstrijcmp_invalidInput
+    cmpb    (%rdi), %dl    # check if j > dst.len
+    jg    .pstrijcpy_invalidInput
+    cmpb    (%rsi), %cl    # check if j > src.len
+    jg    .pstrijcpy_invalidInput    
+    # if the input is valid we can continute
+    incq    %rdi    # adjust pointer to the string part
+    incq    %rsi    # adjust pointer to the string part
+    movq    %rsi, %r11    # a copy of the src pointer
+    leaq    (%rdi, %rdx), %rdi   # pointer to dst + i
+    leaq    (%rsi, %rdx), %rsi   # pointer to src + i
+    leaq    (%r11, %rcx), %r11   # pointer to src + j
+    incq    %r11    # this points to src + j +1 - we will use it as a sentry to finish the scan
+.pstrijcpy_doWhile:
+    # rewrite the char, takes two steps since we need to write from memory to memory
+    movb    (%rsi), %r8b    # src[i] -> temp
+    movb    %r8b, (%rdi)    # temp -> dst[i]
+    incq    %rsi    # src++
+    incq    %rdi    # dst++
+    # check if the stop condition is meant
+    cmpq    %rsi, %r11
+    jne    .pstrijcpy_doWhile
+    popq    %r11
     ret
 .pstrijcpy_invalidInput:
-    # we need to use %rdi so we will push it
-    pushq %rdi
-    movq $format_invalidInput,  %rdi # pass the string format for printf
-    xorq %rax, %rax
-    call printf
-    # we need to return the pstr pointer
-    pop %rdi
-    movq %rdi, %rax
+    popq    %r11
+    movq    $format_invalidInput, %rdi    # pass proper fomrat to printf
+    xorq    %rax, %rax    # set %rax to 0
+    call    printf
     ret
 
     .global swapCase

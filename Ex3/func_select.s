@@ -22,7 +22,7 @@
     msg_pstrijcmp:    .string    "comapre result: %d\n"
     msg_default_case:    .string    "invalid option\n"
     # literals for scanf, printf
-    format_scan_int:     .string    "%d"
+    format_scan_int:     .string    " %d"
     format_scan_char:    .string    " %c"
     format_scan_string:    .string    " %s"
 
@@ -38,9 +38,6 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     cmpq    $10, %rbx # check if the choice is in range
     ja    .f_default # if the number is not in range we ha
     jmp    *.JUMP_TABLE(,%rbx,8)
-    movq    %rbp, %rsp
-    popq    %rbp
-    ret
 
 .f_pstrlen:
     # getting the length of the 1st pString
@@ -109,54 +106,59 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     xorq    %rax, %rax    # set %rax to 0
     call    printf
     # restoring the stack frame
-    movq    %rbp, %rsp
-    popq    %rbp
-    ret
+    jmp    .end_sequence
 
 
 .f_pstrijcpy:
-    # get the i index - save on stack
-    movq    $format_scan_int, %rdi    # pass the proper format to scanf
-    leaq    -32(%rbp), %rsi    # pass the address of i
-    xorq    %rax, %rax    # set %rax to 0
-    call    scanf
-    # movq    %rax, %rdx    # saving the the index 
-    # get the j index - save on stack
-    leaq    -24(%rbp), %rsi   # pass the address of j, note that the correct format is in %rdi
-    xorq    %rax, %rax    # set %rax to 0
-    call    scanf
-    # movq    %rax, %rcx
-    # prep parameters to pstrijcpy
-    leaq    -48(%rbp), %rdi    # dest - the 1st pString
-    leaq    -40(%rbp), %rsi    # src - the 2nd Pstring
-    leaq    -32(%rbp), %rdx    # index i
-    leaq    -24(%rbp), %rcx    # index j 
-    call    pstrijcpy    # call pstrijcpy
-    movq    %rax, -16(%rbp)    # saving the pointer to pString from pstrijcpy
-
-    # print the pStrings by the proper format
+    pushq    %rbp
+    movq    %rsp, %rbp
+    # save the stack frame, create room for 
+    subq    $8, %rsp    # room for 2 ints from the user, using 16 to keep the alignmet of the stack pointer
+                         # as a multiple of 16
+     # save the pointers to the strings
+    pushq    %rdx    # pointer to the 2nd pString
+    pushq    %rsi    # pointer to the 1st pString
     
-    # 1st pString - destination (actually the new pString)
-    movq    -16(%rbp), %rdi    
-    call    pstrlen    # calculating the legth of the pString
-    movq    %rax, %rsi    # will be used later when calling for printf
-    movq    -16(%rbp), %rdx    # passing the pointer of the pString for printf
-    incq    %rdx    # adjusting the pointer to the string part of the pString
-    movq    $format_pstr_info, %rdi    # passing the proper format for prtinf
-    xorq    %rax, %rax  # set %rax to 0
+    # scanning the 1st index
+    movq    $format_scan_int, %rdi    # pass the proper format
+    leaq    16(%rsp), %rsi    # pass the memory address 
+    xorq    %rax, %rax    # set %rax to 0
+    call    scanf
+
+    # scannig the 2nd index
+    movq    $format_scan_int, %rdi    # pass the proper format
+    leaq    20(%rsp), %rsi    # pass the memory address
+    xorq    %rax, %rax    # set %rax to 0
+    call    scanf
+
+    # calling pstrijcpy
+    popq    %rdi    # 1st pString is the first element on the stack and is the dest argument.
+                    # reduce the offset of the stack by 8
+    movq    %rdi, %r12    # save a copy for later use (printing the case message)
+    popq    %rsi    # 1st pString is the second element and is the src argument.
+                    # reduce the offset of the stack by 8
+    movq    %rsi, %r11    # save a copy for later use (printing the case message)
+    movl    (%rsp), %edx    # passing the index i
+    movl    4(%rsp), %ecx    # passing the index j
+    call    pstrijcpy
+
+    # printing the 1st pString - src
+    movq    $format_pstr_info, %rdi    # pass the proper format for printf
+    movzbq    (%r12), %rsi    # passing the length of the pString to %rsi
+    incq    %r12    # adjusting the pointer to string part
+    movq    %r12, %rdx    # passing the pointer to the string to %rdx
+    xorq    %rax, %rax    # set %rax to 0
+    pushq   %r11    # cahgnes in printf
     call    printf
+    popq    %r11
 
-    # 2nd pString - src (the 2nd pString)
-    movq    -40(%rbp), %rdi
-    call    pstrlen    # calculating the length of the pString
-    movq    %rax, %rsi    # will be used later when calling for printf
-    movq    -40(%rbp), %rdx     # passing the pointer to the pString as a parameter to printf
-    incq    %rdx    # adjusting the pointer to the string part of the string
-    movq    $format_pstr_info, %rdi    # passing the proper format to printf
-    xorq    %rax, %rax  # set %rax to 0
-    call printf
-
-    # end of the case, initiate end sequence
+    # printing the 2nd pString - dest
+    movq    $format_pstr_info, %rdi    # pass the proper format for printf
+    movzbq    (%r11), %rsi    # passing the length of the pString to %rsi
+    incq    %r11    # adjusting the pointer to string part
+    movq    %r11, %rdx    # passing the pointer to the string to %rdx
+    xorq    %rax, %rax    # set %rax to 0
+    call    printf
     jmp    .end_sequence
 
 .f_swapCase:
@@ -169,14 +171,9 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     movq    $msg_default_case, %rdi
     xorq    %rax, %rax
     call printf
-    ret
 
 .end_sequence:
-    # restore the data saved to the proper registers
-    movq    -48(%rbp), %rsi
-    movq    -40(%rbp), %rdx
-    # set the old process stack frame
-    addq    $48, %rsp    # deallocate the stack frame
+    # restore stack frame
     movq    %rbp, %rsp
     popq    %rbp
     ret
