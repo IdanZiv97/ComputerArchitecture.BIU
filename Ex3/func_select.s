@@ -106,9 +106,6 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     xorq    %rax, %rax    # set %rax to 0
     call    printf
     # restoring the stack frame
-    addq    $1, %rsp
-    popq    %rbp
-    movq    %rbp, %rsp
     jmp    .end_sequence
 
 
