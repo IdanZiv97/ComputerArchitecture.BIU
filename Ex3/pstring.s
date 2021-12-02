@@ -20,17 +20,24 @@ replaceChar: # %rdi- pointer to pstring, %rsi - oldChar, %rdx - new char
     # create a pointer to the end of the string
     movzbq    (%rdi), %r9     # saving the size of the pString
     leaq    (%rdi, %r9), %rdi    # creating a pointer to the end of the string
+    movb    (%rsi), %r10b    # Note: we have pointers to chars saved in the memory, so we need to derefernce
+    movb    (%rdx), %r11b    # them in order to perfom the comparisons and rewrites
     # starting from the end of the string, all the way down
     # when we reach to the address of the size we will stop (since we covered the whole string)
 .replaceChar_doWhile:
-    cmpb    (%rdi), %sil    # check if the current char in the string equals to the oldChar (which is save as a byte)
-    jne    .replaceChar_goToNextChar    # if there is no match - go check the next char
-    movb    %dl, (%rdi)    # write the newChar instead of the oldChar
-.replaceChar_goToNextChar:
+    cmpb    %r10b, (%rdi)    # check if the current char in the string equals to the oldChar (which is save as a byte)
+    je    .replaceChar_makeSwap   
     decq    %rdi    # == pstr--
-    cmpq    %rdi, %rax    # check if we reached the end r10 > rax
+    cmpq    %rdi, %rax    # check if we reached the end
     jl    .replaceChar_doWhile    # continue the loop
     ret
+.replaceChar_makeSwap:
+    movb    %r11b, (%rdi)    # write the newChar instead of the oldChar)
+    decq    %rdi    # == pstr--
+    cmpq    %rdi, %rax    # check if we reach the end
+    jl    .replaceChar_doWhile
+    ret
+    
 
     .global pstrijcpy
     .type pstrijcpy, @function
