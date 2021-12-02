@@ -190,12 +190,52 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     jmp    .end_sequence
 
 .f_pstrijcmp:
-    ret
+    # set new stack frame
+    pushq    %rbp
+    movq    %rsp, %rbp
+    # create space for two ints
+    subq    $8, %rsp    # two ints => 4 * 2 = 8
+    # save the pointers to pString
+    pushq    %rdx    # the pointer to the 2nd pString
+    pushq    %rsi    # the pointer to the 2nd pString
+    
+    # scan the int i
+    movq    $format_scan_int, %rdi    # pass the proper format fpr scanf
+    leaq    16(%rsp), %rsi    # pass the address of int i
+    xorq    %rax, %rax    # set %rax to 0
+    call    scanf
+    
+    # scan the int j
+    movq    $format_scan_int, %rdi    # pass the proper format for scanf
+    leaq    20(%rsp), %rsi    # pass the address of int j
+    xorq    %rax, %rax
+    call    scanf
+
+    # send the arguments for pstrijcmp
+    popq    %rdi    # pointer to 1st pString
+    movq    %rdi, %r13    # create a copy for later use (printing compare result)
+    popq    %rsi    # pointer to 2nd pString
+    movq    %rsi, %r14    # Note: the offset from %rsp to the ints is now 0 and 4
+    movl    (%rsp), %edx    # pass index i
+    movl    4(%rsp), %ecx    # pass index j
+    call    pstrijcmp
+    
+    movl    %eax, %esi    # save compare result
+    movq    $msg_pstrijcmp, %rdi    # pass the proper format for printf
+    xorq    %rax, %rax    # set %rax to 0
+    call    printf
+
+    movq    %rbp, %rsp
+    popq    %rbp
+    jmp    .end_sequence
+
+
 
 .f_default:
     movq    $msg_default_case, %rdi
     xorq    %rax, %rax
     call printf
+    jmp    .end_sequence
 
 .end_sequence:
     # restore stack frame
