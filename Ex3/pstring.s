@@ -145,8 +145,8 @@ pstrijcmp: # %rdi - pstr1, %rsi - pstr2, %rdx - i, %rcx - j
 .pstrijcmp_doWhile:
     movb    (%rdi), %r11b    # pstr1[i] == pstr2[i] ?
     cmpb    %r11b, (%rsi)    # can't access memory to memory
-    jg    .pstrijcmp_pstr1isBigger
-    jl    .pstrijcmp_pstr2isBigger
+    jl    .pstrijcmp_pstr1isBigger
+    jg    .pstrijcmp_pstr2isBigger
     incq    %rdi    # pstr1++
     incq    %rsi    # pstr2++
     cmpq    %r11, %rdi    # check if we reached the end of the range
@@ -154,11 +154,11 @@ pstrijcmp: # %rdi - pstr1, %rsi - pstr2, %rdx - i, %rcx - j
     movq    $0, %rax
     ret
 
-.pstrijcmp_pstr1isBigger:
-    movl    $1, %eax    # set the compare result to 1
-    ret
 .pstrijcmp_pstr2isBigger:
-    movl    $-1, %eax     # set the compare result to -1
+    movl    $-1, %eax    # set the compare result to 1
+    ret
+.pstrijcmp_pstr1isBigger:
+    movl    $1, %eax     # set the compare result to -1
     ret
 
 .pstrijcmp_invalidInput:
