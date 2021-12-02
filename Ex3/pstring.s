@@ -143,8 +143,8 @@ pstrijcmp: # %rdi - pstr1, %rsi - pstr2, %rdx - i, %rcx - j
     leaq    (%r11, %rcx), %r11    # pointer to pstr1 + j
     incq    %r11    # this points to pstr1 + j + 1 - we will use it as a sentry to finish the comparison
 .pstrijcmp_doWhile:
-    movb    (%rdi), %r11b    # pstr1[i] == pstr2[i] ?
-    cmpb    %r11b, (%rsi)    # can't access memory to memory
+    movb    (%rdi), %r12b    # pstr1[i] == pstr2[i] ?
+    cmpb    %r12b, (%rsi)    # can't access memory to memory, so we use a buffer
     jl    .pstrijcmp_pstr1isBigger
     jg    .pstrijcmp_pstr2isBigger
     incq    %rdi    # pstr1++
