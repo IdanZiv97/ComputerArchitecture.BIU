@@ -33,31 +33,30 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     # create stack frame to hold the pointers to pStrings and chars that will be scaned.
     pushq    %rbp
     movq    %rsp, %rbp
-    subq    $48, %rsp    # Note: we need to hold only 8 refrences (2 pointers and 2 chars or 2 indexes) but it is not a
-                         # multiple of 16 - so the we align the stack pointer to 48
-    movq    %rsi, -48(%rbp)    # save the pointer to the 1st pString
-    movq    %rdx, -40(%rbp)    # save the pointer to the 2nd Pstring
     # correcting the input offset to match the first case
     leaq    -50(%rdi), %rbx # setting the choice to match the range
     cmpq    $10, %rbx # check if the choice is in range
     ja    .f_default # if the number is not in range we ha
     jmp    *.JUMP_TABLE(,%rbx,8)
+    movq    %rbp, %rsp
+    popq    %rbp
+    ret
 
 .f_pstrlen:
     # getting the length of the 1st pString
     movq    %rsi, %rdi    # send the pointer as the parameter
     call    pstrlen
-    movq    %rax, -32(%rbp)    # saving the return value from pstrlen to the stack
+    movq    %rax, %r11    # saving the return value from pstrlen to the stack
 
     # getting the length of the 2nd pString
     movq    %rdx, %rdi    # send the pointer as the parameter
     call    pstrlen
-    movq    %rax, -24(%rbp)    # saving the return value from pstrlen to the stack
+    movq    %rax, %r10    # saving the return value from pstrlen to the stack
 
     # print the message
     movq    $msg_pstrlen, %rdi    # pasing the proper message to printf
-    movl    -32(%rbp), %esi    # passing the length of the 1st pString
-    movl    -24(%rbp), %edx    # passing the length of the 2nd pString
+    movq    %r11, %rsi    # passing the length of the 1st pString
+    movq    %r10, %rdx    # passing the length of the 2nd pString
     xorq    %rax, %rax    # set %rax to 0
     call    printf
 
@@ -109,6 +108,9 @@ run_func:   # the case number is in %rdi (%edi), the 1st pString in %rsi, the 2n
     incq    %r8
     xorq    %rax, %rax    # set %rax to 0
     call    printf
+    # restoring the stack frame
+    movq    %rbp, %rsp
+    popq    %rbp
     ret
 
 
