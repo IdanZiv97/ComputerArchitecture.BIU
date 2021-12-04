@@ -1,4 +1,4 @@
-#318175197 Idan Ziv
+# 318175197 Idan Ziv
 .section .rodata
     .align 8
     format_invalidInput: .string "invalid input!\n"
