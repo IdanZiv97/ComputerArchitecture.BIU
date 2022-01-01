@@ -53,8 +53,7 @@ pstrijcpy: # %rdi - dst, %rsi - src, %rdx -i, %rcx - j
     cmpb    (%rdi), %dl    # check if j > dst.len
     jge    .pstrijcpy_invalidInput
     cmpb    (%rsi), %cl    # check if j > src.len
-    jge    .pstrijcpy_invalidInput    
-    # if the input is valid we can continute
+    jge    .pstrijcpy_invalidInput # if the input is valid we can continute
     incq    %rdi    # adjust pointer to the string part
     incq    %rsi    # adjust pointer to the string part
     movq    %rsi, %r11    # a copy of the src pointer
