@@ -1,676 +1,751 @@
-// Idan Ziv 318175197
-
-#include <stdio.h>
-#define ASCI_NUMBERS 48
-#define DIF 32
-#define ASCI_LETTERS 55
-
-
-void powTwo(int number1);
-void BaseToDecimalSolution();
-int powerFunction(int base, int power);
-void baseTwentyToDecimalSolution();
-void add();
-int base20Todecimal(char c);
-void multiply();
-void differentBits();
-unsigned int count1Bits(unsigned int number);
-void rhombus();
-void printSpaces(int number);
-
-
-int main()
-{
-    char choice;
-    printf("Choose an option:\n");
-    printf("1. Rhombus\n2. Base 20 to Decimal\n3. Base to Decimal\n4. Pow2\n5. Different bits\n6. Add\n"
-           "7. Multiply\n0. Exit\n");
-    scanf(" %c",&choice);
-
-    //while the user's choice is between 0-9
-
-    while (choice<8 || choice > 0)
-    {
-        //if the user choose 0 the program exists
-
-        if (choice == '0')
-        {
-            return 0;
-        }
-
-        //if user choose something greater than 9 in ascii , he would get error message
-
-        while (choice > '9')
-        {
-            printf("Wrong option!\n");
-            printf("1. Rhombus\n2. Base 20 to Decimal\n3. Base to Decimal\n4. Pow2\n5. Different bits\n"
-                   "6. Add\n7. Multiply\n0. Exit\n");
-            scanf(" %c",&choice);
-        }
-
-        //if user choose 4 mission 4 starts
-
-        if (choice == '4')
-        {
-            int number;
-            printf("Enter a number:\n");
-            scanf(" %d",&number);
-            powTwo(number);
-        }
-
-            //if user choose 3 mission 3 starts
-
-        else if (choice == '3')
-        {
-            BaseToDecimalSolution();
-        }
-
-            //if user choose 2 mission 2 starts
-
-        else if (choice == '2')
-        {
-            baseTwentyToDecimalSolution();
-        }
-
-            //if user choose 6 mission 6 starts
-
-        else if (choice == '6')
-        {
-            add();
-        }
-
-            //if user choose 4 mission 4 starts
-
-        else if (choice == '7')
-        {
-            multiply();
-        }
-
-            //if user choose 5 mission 5 starts
-
-        else if (choice == '5')
-        {
-            differentBits();
-        }
-
-            //if user choose 1 mission 1 starts
-
-        else if (choice == '1')
-        {
-            rhombus();
-        }
-        printf("Choose an option:\n");
-        printf("1. Rhombus\n2. Base 20 to Decimal\n3. Base to Decimal\n4. Pow2\n5. Different bits\n"
-               "6. Add\n7. Multiply\n0. Exit\n");
-        scanf(" %c",&choice);
-    }
-}
-
-/****************************************
- * function Name: powTwo
- * Input: int number>0
- * Output: number is power of 2 / number is not power of 2
- * Function operation: the function checks whether the input number is power of 2 or not.
- ******************************************/
-
-void powTwo(int number1) {
-
-    // if user put 0 he'd get error (0 is not natural number)
-
-    if (number1 == 0)
-    {
-        printf("Error\n");
-        return;
-    }
-
-    // if user put 1 , no need to calculating anything, just return yes
-
-    if (number1 == 1)
-    {
-        printf("%d is a power of 2\n",number1);
-        return;
-    }
-
-    /*********
-     * To check whether number is power of 2 , subtract one from the original number and use the bitwise & with
-     * the new number, if you get 0 then the original number indeed power of 2, if you don't then it's not.
-     */
-    int number2 = number1 - 1;
-    int score = number1&number2;
-
-    //check whether the process return 0
-
-    if (score == 0)
-    {
-        printf("%d is a power of 2\n",number1);
-        return;
-    }
-    else
-    {
-        printf("%d is not a power of 2\n",number1);
-        return;
-    }
-}
-
-/****************************************
- * function Name: BaseToDecimalSolution
- * Input: char (2<= values <= 10) of general base
- * Output: number in decimal base
- * Function operation: the function converts number from general base to decimal base
- ******************************************/
-
-void BaseToDecimalSolution()
-{
-    char base;
-    int count = 0;
-    int answer = 0;
-    int isBase = 0;
-    printf("Enter a base (2-10):\n");
-    scanf(" %c",&base);
-
-    //in order to get the char to int with ascii table subtraction
-
-    int numBase = ((int)base - ASCI_NUMBERS);
-    printf("Enter a reversed number in base %c:\n",base);
-    char  c;
-    scanf(" %c",&c);
-
-    //get infinite number of input until the user presses enter
-
-    while (c!= '\n')
-    {
-
-        /**********
-         * in order to convert from any base to decimal base you take the number with the chosen base, power it by
-         * the index and multiply  by the chosen base
-         */
-
-        int temp = ((int)c - ASCI_NUMBERS);
-        int power = powerFunction(numBase, count);
-        int temp2 = temp*power;
-
-        // add all numbers
-
-        answer+=temp2;
-
-        // index up by one
-
-        count++;
-
-        // if user input number bigger or lower then its chosen base he'd get error
-
-        if (c >= base || c < '0' )
-        {
-            printf("Error! %c is not a valid digit in base %c\n",c,base);
-
-            //flag
-
-            isBase = 1;
-        }
-        scanf("%c",&c);
-    }
-
-    //if flag isn't up it means no error were made, we can print the final answer
-
-    if (isBase == 0)
-    {
-        printf("%d\n",answer);
-    }
-}
-
-/****************************************
- * function Name: baseTwentyToDecimalSolution
- * Input: char number in base 20
- * Output: number in decimal base
- * Function operation: the function converts number from base 20 to decimal base
- *                      Error - input bigger or lower then base 20:
- *                      Error values: (c < '0') || (c > '9' && c < 'A') || (c > 'J' && c < 'a') || (c > 'j')
- ******************************************/
-
-
-void baseTwentyToDecimalSolution() {
-    int base = 20;
-    int count = 0;
-    int answer = 0;
-    int isBase = 0;
-    printf("Enter a reversed number in base %d:\n", base);
-    char c;
-    scanf(" %c", &c);
-
-    //get infinite number of input until the user presses enter
-
-    while (c != '\n')
-    {
-        //if the user's input is not in base 20, print error
-
-        if (c < '0' || (c > '9' && c < 'A') || (c > 'J' && c < 'a') || (c > 'j'))
-        {
-            printf("Error! %c is not a valid digit in base %d\n", c, base);
-
-            //flag
-
-            isBase = 1;
-        }
-
-        /**********
-         * in order to convert from base 20  to decimal base you take the number with the chosen base, power it by
-         * the index and multiply  by 20
-         */
-
-        //calling to another function that calculates the number power of 20 and returns the answer
-
-        int power = powerFunction(base, count);
-        int temp = base20Todecimal(c);
-        int temp2 = temp * power;
-
-        // add all numbers
-
-        answer += temp2;
-
-        //index up by one
-
-        count++;
-        scanf("%c", &c);
-    }
-
-    // if error flag isn't up prints the sum
-
-
-    if (isBase == 0)
-    {
-        printf("%d\n", answer);
-    }
-}
-
-/****************************************
- * function Name: add
- * Input: two integer values
- * Output: the outcome of the addition between them
- * Function operation: the function calculates the addition between the two numbers and prints to the screen
- ******************************************/
-
-void add()
-{
-    int number1, number2;
-    printf("Enter two numbers:\n");
-    scanf(" %d",&number1);
-    scanf(" %d",&number2);
-
-    // if either numbers is 0 , prints the other number
-
-    if (number2 == 0)
-    {
-        printf("%d\n",number1);
-        return;
-    }
-
-    // if either numbers is 0 , prints the other number
-
-    if (number1 == 0)
-    {
-        printf("%d\n",number2);
-        return;
-    }
-
-    // if both number are positive
-
-    if (number2 > 0 && number1 > 0)
-    {
-        //loop first number times and up number 2 by one with operation ++
-
-        for (int i = 0; i<number1; i++)
-        {
-            number2++;
-        }
-        printf("%d\n",number2);
-        return;
-    }
-
-    //if number1 is negative
-
-    if (number1 < 0 )
-    {
-
-        // loop first number times and subtract number two by one with operation --
-
-        for (int i = 0; i>number1; i--)
-        {
-            number2--;
-        }
-        printf("%d\n",number2);
-        return;
-    }
-
-    //if number1 is negative
-
-    if (number2 < 0 )
-    {
-
-        // loop second number times and subtract number one by one with operation --, loop in reverse order
-
-        for (int i = 0; i>number2; i--)
-        {
-            number1--;
-        }
-        printf("%d\n",number1);
-        return;
-    }
-
-    //if both number are negative
-
-    if (number2 < 0 && number1<0)
-    {
-
-        // loop first number times and subtract number two by one with operation --, loop in reverse order
-
-        for (int i = 0; i>number1; i--)
-        {
-            number2--;
-        }
-        printf("%d\n",number2);
-        return;
-    }
-}
-
-/**********************************
- * function Name: power
- * Input: base, power
- * Output: base ^ power
- * Function operation: takes int base and int power and calculating base^power
- ***********************************/
-
-int powerFunction(int base, int power)
-{
-    //if power is 0 , return 1
-
-    if (power == 0)
-    {
-        return 1;
-    }
-
-    int sum = 1;
-
-    // with loop multiply each time by the power and add it to sum. then return sum
-
-    for (int i = 0; i < power; i++)
-    {
-        sum = sum * base;
-    }
-    return sum;
-}
-
-
 /***************
- * function Name: base20Todecimal
- * Input: char c
- * Output: c in decimal by base 20
- * Function operation: takes char from user check whether its number or capital letter or small letter and return it's
-                       value in decimal
- *****************/
-
-int base20Todecimal(char c)
-{
-    //if input is number in type char
-
-    if (c>='0' && c<='9')
+ * Idan Ziv
+ * 318175197
+ * 01
+ * ass02
+ ***************/
+#include <stdio.h>
+/************
+ * Function Name: drawRhombus
+ * Input: int length (valid value 0 < length)
+ * Output: a shape of a rhombus with the side in the length of the input
+ * Function Operation:
+ *                      The function will take a length and will print two halfes of the shape and a middle line
+ *                      The parts are printed in a a pattern, depnded on the length entered.
+**************/
+void drawRhombus()
+{//Declaring the variables
+    int length, row;
+    //Getting input from user
+    printf("Enter the sides length:\n");
+    scanf("%d", &length);
+    //Printing the first half
+    for(row = 0; row <= length-1; row++)
     {
-        return ((int)c - ASCI_NUMBERS);
+        printf("%*c%*c%*c\n", length-row,'/',row+1,'*', row+1,'\\');
     }
-
-    //if the input is between A and J (capital letters)
-
-    if (c>='A' && c<='J')
-    {
-        return ((int)c - ASCI_LETTERS);
-    }
-
-    //if the input is between a and a (small letters)
-
-    if (c>='a' && c<='j')
-    {
-        return ((int)c - (DIF+ASCI_LETTERS));
-    }
+    //Printing the middle shape
+    printf("|%*c%*c\n",length, '+',length,'|');
+    //Printing the bottom half
+    for(row = 0; row <= length-1; row++)
+        printf("%*c%*c%*c\n", row+1, '\\', length-row, '*', length-row, '/');
 }
-
-/****************************************
- * function Name: multiply
- * Input: two integer values
- * Output: the outcome of the multiplication between them
- * Function operation: the function calculates the multiplication between the two numbers and prints to the screen
- ******************************************/
-
-void multiply()
+/*************
+ * Function Name: base20toDecimal
+ * Input: char c (valid values '0' <= c <= '9'; 'a'/'A' <= reversedNum <= 'j'/'J')
+ * Output: int reversedNum (values are poteintialy infinite)
+ * Function Operation: 1. The function scans the STDIN buffer for the user's input.
+ *                     2. The fucntion checks if the digit entered is a valid digit in base-20.
+ *                     if not, it will print an error.
+ *                     3. The function compares the value of the input to a case pre-determined
+ *                     multipy the value of the digit according to the algorithm of converting from N base to decimal
+ *                     4. Every invalid digit wil be printed to the user as an error message.
+*****************/
+void base20toDecimal()
 {
-    int number1;
-    int number2;
-    printf("Enter two numbers:\n");
-
-    scanf(" %d",&number1);
-    scanf(" %d",&number2);
-
-    // if both numbers are positive
-
-    if (number2 > 0 && number1 > 0)
-    {
-        int addition = number2;
-
-        // loop number1 - 1 times and add number2 to himself
-
-        for (int i = 0; i<number1-1; i++)
+  //The used variables
+    char c;
+    int reversedNum = 0, factor = 1, validCheck = 0;
+    printf("Enter a reversed number in base 20:\n");
+    scanf("%c", &c);
+    //scanf is a condition because the buffer contains the rest of the characters the user printed
+    while(scanf("%c", &c) && c != '\n'){ 
+        //I'll use switch case because I know what are the wanted cases, and a default.
+        switch (c)
         {
-            number2+= addition;
-        }
-        printf("%d\n",number2);
-        return;
+        //comparing the value of c to a certain ASCII value
+        case '0':
+            reversedNum += 0*factor;
+            factor *= 20;
+            break;
+        //comparing the value of c to a certain ASCII value    
+        case '1':
+            reversedNum += 1*factor;
+            factor *= 20;
+            break;
+        //comparing the value of c to a certain ASCII value
+        case '2':
+            reversedNum += 2*factor;
+            factor *= 20;
+            break;
+        //comparing the value of c to a certain ASCII value
+        case '3':
+            reversedNum += 3*factor;
+            factor *= 20;
+            break;
+        //comparing the value of c to a certain ASCII value
+        case '4':
+            reversedNum += 4*factor;
+            factor *= 20;
+            break;
+        //comparing the value of c to a certain ASCII value
+        case '5':
+            reversedNum += 5*factor;
+            factor *= 20;
+            break;
+        //comparing the value of c to a certain ASCII value
+        case '6':
+            reversedNum += 6*factor;
+            factor *= 20;
+            break;
+        //comparing the value of c to a certain ASCII value
+        case '7':
+            reversedNum += 7*factor;
+            factor *= 20;
+            break;
+        //comparing the value of c to a certain ASCII value
+        case '8':
+            reversedNum += 8*factor;
+            factor *= 20;
+            break;
+        //comparing the value of c to a certain ASCII value
+        case '9':
+            reversedNum += 9*factor;
+            factor *= 20;
+            break;
+        //There are no differnce between this two cases, so we will not put a break between them
+        case 'A':
+        case 'a':
+            reversedNum += 10*factor;
+            factor *= 20;
+            break;
+        //There are no differnce between this two cases, so we will not put a break between them
+        case 'B':
+        case 'b':
+            reversedNum += 12*factor;
+            factor *= 20;
+            break;
+        //There are no differnce between this two cases, so we will not put a break between them
+        case 'C':
+        case 'c':
+            reversedNum +=13*factor;
+            factor *= 20;
+            break;
+        //There are no differnce between this two cases, so we will not put a break between them
+        case 'D':
+        case 'd':
+            reversedNum += 13*factor;
+            factor *= 20;
+            break;
+        //There are no differnce between this two cases, so we will not put a break between them
+        case 'E':
+        case 'e':
+            reversedNum += 14*factor;
+            factor *= 20;
+            break;
+        //There are no differnce between this two cases, so we will not put a break between them
+        case 'F':
+        case 'f':
+            reversedNum += 15*factor;
+            factor *= 20;
+            break;
+        //There are no differnce between this two cases, so we will not put a break between them
+        case 'G':
+        case 'g':
+            reversedNum += 16*factor;
+            factor *= 20;
+            break;
+        //There are no differnce between this two cases, so we will not put a break between them
+        case 'H':
+        case 'h':
+            reversedNum += 17*factor;
+            factor *= 20;
+            break;
+        //There are no differnce between this two cases, so we will not put a break between them
+        case 'I':
+        case 'i':
+            reversedNum += 18*factor;
+            factor *= 20;
+            break;
+        //There are no differnce between this two cases, so we will not put a break between them
+        case 'J':
+        case 'j':
+            reversedNum += 19*factor;
+            factor *= 20;
+            break;
+        //The default case prints out all the invalid digits in base-20 entered by the user
+        default:
+            printf("Error! %c is not a valid digit in base 20\n", c);
+            validCheck++;// we will use boolean value to test if the number is being printed or not
+            break;
+        }   
     }
-
-    // if one of the numbers is 0 prints 0
-
-    if (number2 == 0 || number1 ==0 )
-    {
-        printf("%d\n",0);
-        return;
-    }
-
-    // if number2 is negative and number1 is positive
-
-    if (number2 < 0 && number1 > 0)
-    {
-        int addition = number2;
-
-        // loop number1 - 1 times and add number2 to himself
-
-        for (int i = 0; i<number1-1; i++)
-        {
-            number2+=addition;
-        }
-
-        printf("%d\n",number2);
-        return;
-    }
-
-    // if number2 is positive and number1 is negative
-    if (number2 > 0 && number1 < 0)
-    {
-        int addition = number1;
-
-        // loop number2 - 1 times and add number1 to himself
-
-        for (int i = 0; i<number2-1; i++)
-        {
-            number1+=addition;
-        }
-        printf("%d\n",number1);
-        return;
-    }
-
-    // if both numbers are negative convert them to positive using bitwise operators
-
-    if (number2 < 0 && number1 < 0)
-    {
-        int positiveNumber2 = ~number2 + 1;
-        int positiveNumber1 = ~number1 + 1;
-        int addition = positiveNumber1;
-
-        // loop positiveNumber2 - 1 times and add positiveNumber1 to himself
-
-        for (int i = 0; i<positiveNumber2-1; i++)
-        {
-            positiveNumber1+=addition;
-        }
-        printf("%d\n",positiveNumber1);
-        return;
-    }
+//Checking the boolean value
+if(validCheck == 0)
+{
+    printf("%d\n", reversedNum);
+} 
 }
-
-/****************************************
- * function Name: differentBits
- * Input: two integer values
- * Output: how many different bits between to numbers
- * Function operation: the function using XOR operator between two numbers and store it in another variable.
- *                     then calls another function to calculate how many 1 bits in the variable and prints to the screen
- ******************************************/
-
+/**********
+ * Fucntion Name: baseToDecimal
+ * Input: int base (valid values 2 <= base <= 10)
+ *         char c ('0' <= c <= '(base-1)')
+ * Output: int reversedNum (valid values are potientialy infinite)
+ * Function Operation: 1.The user enter a valid base
+ *                     2.The user enters a reversed number in the base that he choose.
+ *                     3.According to the base entered by the user, the program converts the nubmer according to the
+ *                       to the algorithm of converting of base N to decimal.
+ *                     4.The function prints out the invalid digits, according to the base entered, as an error message.
+ ***************/
+void baseToDecimal()
+{
+    //The variables
+    int base, factor = 1, reversedNum = 0, errorCounter = 0;
+    char c;
+    //Asking the user for a base, we assume that the input is valid
+    printf("Enter a base (2-10):\n");
+    scanf("%d", &base);
+    printf("Enter a reversed number in base %d:\n", base);
+    //the user will print '\n' when setting the input so i want a scanf to clear the buffer from white spaces before it loops
+    scanf("%c", &c);
+    //I want the loop to keep scanning the input up to the point the user presses "enter"
+    while(scanf("%c", &c) && c != '\n')
+    {
+        //base 10 to decimal
+        if(base == 10)
+        {
+            switch(c)
+            {
+             case '0':
+                reversedNum += 0*factor;
+                factor *= base;
+                break;
+            case '1':
+                reversedNum += 1*factor;
+                factor *= base;
+                break;
+            case '2':
+                reversedNum += 2*factor;
+                factor *= base;
+                break;
+            case '3':
+                reversedNum += 3*factor;
+                factor *= base;
+                break;
+            case '4':
+                reversedNum += 4*factor;
+                factor *= base;
+                break;
+            case '5':
+                reversedNum += 5*factor;
+                factor *= base;
+                break;
+            case '6':
+                reversedNum += 6*factor;
+                factor *= base;
+                break;
+            case '7':
+                reversedNum += 7*factor;
+                factor *= base;
+                break;
+            case '8':
+                reversedNum += 8*factor;
+                factor *= base;
+                break;
+            case '9':
+                reversedNum += 9*factor;
+                factor *= base;
+                break;
+            default:
+                printf("Error! %c is not a valid digit in base %d\n", c,base);
+                errorCounter += 1;
+                break;
+            }
+        }
+        //base 2 - using the binary to decimal algorithm we learned
+        else if(base == 2)
+        {
+            switch (c)
+            {
+            case '0':
+                factor *= base;
+                break;
+            case '1':
+                reversedNum += 1*factor;
+                factor *= base;
+                break;
+            default:
+                printf("Error! %c is not a valid digit in base %d\n", c, base);
+                errorCounter++;
+                break;
+            }
+        }
+        //base 3 - using the algoritm of binary to decimal but this time we multiply every c input 3^factor
+        else if(base == 3)
+        {
+            switch(c)
+            {
+                case '0':
+                    factor *= base;
+                    break;
+                case '1':
+                    reversedNum += 1*factor;
+                    factor *= base;
+                    break;
+                case '2':
+                    reversedNum += 2*factor;
+                    factor *= base;
+                    break;
+                default:
+                    printf("Error! %c is not a valid digit in base %d\n", c, base);
+                    errorCounter++;
+                    break;
+            }
+        }
+        //base 4 - using the algoritm of binary to decimal but this time we multiply every c input 4^factor
+        else if(base == 4)
+        {
+            switch(c)
+            {
+                case '0':
+                    factor *= base;
+                    break;
+                case '1':
+                    reversedNum += 1*factor;
+                    factor *= base;
+                    break;
+                case '2':
+                    reversedNum += 2*factor;
+                    factor *= base;
+                    break;
+                case '3':
+                    reversedNum += 3*factor;
+                    factor *= base;
+                    break;
+                default:
+                    printf("Error! %c is not a valid digit in base %d\n", c, base);
+                    errorCounter++;
+                    break;
+            }
+        }
+        //base 5 - using the algoritm of binary to decimal but this time we multiply every c input 5^factor
+        else if(base == 5)
+        {
+            switch(c)
+            {
+                case '0':
+                    factor *= base;
+                    break;
+                case '1':
+                    reversedNum += 1*factor;
+                    factor *= base;
+                    break;
+                case '2':
+                    reversedNum += 2*factor;
+                    factor *= base;
+                    break;
+                case '3':
+                    reversedNum += 3*factor;
+                    factor *= base;
+                    break;
+                case '4':
+                    reversedNum += 4*factor;
+                    factor *= base;
+                    break;
+                default:
+                    printf("Error! %c is not a valid digit in base %d\n", c, base);
+                    errorCounter++;
+                    break;
+            }
+        }
+        //base 6 - using the algoritm of binary to decimal but this time we multiply every c input 6^factor
+        else if(base == 6)
+        {
+            switch(c)
+            {
+                case '0':
+                    factor *= base;
+                    break;
+                case '1':
+                    reversedNum += 1*factor;
+                    factor *= base;
+                    break;
+                case '2':
+                    reversedNum += 2*factor;
+                    factor *= base;
+                    break;
+                case '3':
+                    reversedNum += 3*factor;
+                    factor *= base;
+                    break;
+                case '4':
+                    reversedNum += 4*factor;
+                    factor *= base;
+                    break;
+                case '5':
+                    reversedNum += 5*factor;
+                    factor *= base;
+                    break;
+                default:
+                    printf("Error! %c is not a valid digit in base %d\n", c, base);
+                    errorCounter++;
+                    break;
+            }
+        }
+        //base 7 - using the algoritm of binary to decimal but this time we multiply every c input 7^factoR
+        else if(base == 7)
+        {
+            switch(c)
+            {
+                case '0':
+                    factor *= base;
+                    break;
+                case '1':
+                    reversedNum += 1*factor;
+                    factor *= base;
+                    break;
+                case '2':
+                    reversedNum += 2*factor;
+                    factor *= base;
+                    break;
+                case '3':
+                    reversedNum += 3*factor;
+                    factor *= base;
+                    break;
+                case '4':
+                    reversedNum += 4*factor;
+                    factor *= base;
+                    break;
+                case '5':
+                    reversedNum += 5*factor;
+                    factor *= base;
+                    break;
+                case '6':
+                    reversedNum += 6*factor;
+                    factor *= base;
+                    break;
+                default:
+                    printf("Error! %c is not a valid digit in base %d\n", c, base);
+                    errorCounter++;
+                    break;
+            }
+        }
+        //base 8 - using the algoritm of binary to decimal but this time we multiply every c input 8^factor
+        else if(base == 8)
+        {
+            switch(c)
+            {
+                case '0':
+                    factor *= base;
+                    break;
+                case '1':
+                    reversedNum += 1*factor;
+                    factor *= base;
+                    break;
+                case '2':
+                    reversedNum += 2*factor;
+                    factor *= base;
+                    break;
+                case '3':
+                    reversedNum += 3*factor;
+                    factor *= base;
+                    break;
+                case '4':
+                    reversedNum += 4*factor;
+                    factor *= base;
+                    break;
+                case '5':
+                    reversedNum += 5*factor;
+                    factor *= base;
+                    break;
+                case '6':
+                    reversedNum += 6*factor;
+                    factor *= base;
+                    break;
+                case '7':
+                    reversedNum += 7*factor;
+                    factor *= base;
+                    break;
+                default:
+                    printf("Error! %c is not a valid digit in base %d\n", c, base);
+                    errorCounter++;
+                    break;
+            }
+        }
+        //base 9 - using the algoritm of binary to decimal but this time we multiply every c input 3^factor
+        else if(base == 9)
+        {
+            switch(c)
+            {
+            case '0':
+                factor *= base;
+                break;
+            case '1':
+                reversedNum += 1*factor;
+                factor *= base;
+                break;
+            case '2':
+                reversedNum += 2*factor;
+                factor *= base;
+                break;
+            case '3':
+                reversedNum += 3*factor;
+                factor *= base;
+                break;
+            case '4':
+                reversedNum += 4*factor;
+                factor *= base;
+                break;
+            case '5':
+                reversedNum += 5*factor;
+                factor *= base;
+                break;
+            case '6':
+                reversedNum += 6*factor;
+                factor *= base;
+                break;
+            case '7':
+                reversedNum += 7*factor;
+                factor *= base;
+                break;
+            case '8':
+                reversedNum +=  8*factor;
+                factor *= base;
+                break;
+            default:
+                printf("Error! %c is not a valid digit in base %d\n", c, base);
+                errorCounter++;
+                break;
+        }
+    }
+    }
+//This if statement will bring us back to the menu if any invalid digit was entered, if not it will print the number.
+if(errorCounter == 0)
+    printf("%d\n", reversedNum);
+}
+/***************
+ * Function Name: pow2
+ * Input: int num (valid values 0 <= num)
+ * Output: int num (valid values 0 <= num)
+ * Function Operation: 1. The user enters a number.
+ *                     2. The program checks if the number is odd or even.
+ *                     3. If the number is even the function  checks if its a power of 2
+ *                     4. If the number is odd or even ( or a special case) the prints an error.
+ ***********/
+void pow2()
+{
+    int num, flag, mask = 0b0000;
+    printf("Enter a number:\n");
+    scanf("%d", &num);
+    //decision making
+    if(num == 0)
+        flag = 0;
+    else if ((num & (num-1)) == mask)
+        flag = 1;
+    else
+        flag = 0;
+    //The Prining
+    if(flag == 1)
+        printf("%d is a power of 2\n", num);
+    else
+        printf("%d is not a power of 2\n", num);   
+}
+/*****
+ * Function Name: differentBits
+ * Input: int x1,x2 (valid values are potientially infinite)
+ * Output: int difBits (valid values 0 <= difBits)
+ * Function Operation: 1. The users enters 2 numbers.
+ *                     2. The function compares each set of bits.
+ *                     3. When the bits are different the function adds 1 to the counter
+ *                     4. The message prints out a message of number different bits, the value of the counter.
+ * 
+ ******/
 void differentBits()
 {
-    /************
-    * in order to check how many different bits are between two numbers, store the XOR between the two numbers in another
-    * variable and count how many 1 bits it has.
-    */
-
-    int number1,number2;
+    //Getting the input from the user
+    int x1, x2, difBits = 0, mask = 0x0001;
     printf("Enter two numbers:\n");
-    scanf(" %d",&number2);
-    scanf(" %d",&number1);
-    int number3 = number2^number1;
-
-    //calling the function count1Bits
-
-    printf("There are %d different bits\n",count1Bits(number3));
-}
-
-
-/*************************
- * function Name: count1Bits
- * Input: unsigned int n
- * Output: how many 1 bits in the unsigned number
- * Function operation: takes an unsigned int n from user and counts how many 1 bits are in it.
- ***************************/
-
-
-unsigned int count1Bits(unsigned int number)
-{
-    unsigned int count = 0;
-
-    //while the number isn't 0
-
-    while (number!=0)
+    scanf("%d%d", &x1, &x2);
+    for(int i = 0; i < 32; i++)//I use 0 <= i < because the size of int is 4 bytes (32-bit)
     {
-        count += number&1;
-        number >>=1;
+        //We will mask each bit and will compare the results
+        if(((x1>>i) & mask) != ((x2>>i) & mask))
+            difBits += 1;
     }
-    return count;
+    printf("There are %d different bits\n", difBits);
 }
-
-/****************************************
- * function Name: rhombus
- * Input: int size
- * Output: prints Rhombus with length of the input size
- * Function operation: the function prints the Rhombus with the help of another function that prints spaces
- ******************************************/
-
-void rhombus()
+/**********
+ * Function Name: addNumbers
+ * Input: int x1, x2 (valid values are potientialy inifinite)
+ * Output: int sum (valid values are potientialy infinite)
+ * Function Operation: 1. The user enters 2 numbers
+ *                     2. The function checks theyre sign and according to that intializes the sum.
+ *                     3. After the sum is initailized the program uses the the algorithem of adding 1 to the sum 
+ *                        times the value of the numbers.
+ *                     4. If both of the numbers are negative, the program will subtract 1 the times of 
+ *                        value of one of the numbers from the value of the other.
+ ************/
+void addNumbers()
 {
-    int size;
-    printf("Enter the sides length:\n");
-    scanf("%d",&size);
-    int size2 = size-1;
-    int leftSpace = 0;
-    int rightSpace = 0;
-
-    //iterate size times, creating the up half to the Rhombus
-
-    for (int row = 1; row <= size; row++)
+    int x1, x2, sum;
+    printf("Enter two numbers:\n");
+    scanf("%d%d", &x1, &x2);
+    //The case if both of the numbers are positive
+    if(x1 > 0 && x2 > 0)
     {
-        //iterate size times for printing spaces
-
-        for (int space = 1; space <= size2; space++) {
-            printf(" ");
+        //Initializing one of the nubmers as sort of "base" to the addition
+        sum = x2;
+        //the action of adding 1, the numbers of times is  equal to the other number
+        for(int i = 0; i < x1; i++)
+        {
+          sum++;   
         }
-        size2--;
-        printf("/");
-
-        //calls the printSpaces function with the leftSpace value
-
-        printSpaces(leftSpace);
-        leftSpace++;
-        printf("*");
-
-        //calls the printSpaces function with the rightSpace value
-
-        printSpaces(rightSpace);
-        rightSpace++;
-        printf("\\");
-        printf("\n");
+        printf("%d\n", sum);
     }
-
-    //creating the middle part of the Rhombus
-
-    printf("|");
-
-    //calls the printSpaces function with the leftSpace - 1 value
-
-    printSpaces(leftSpace-1);
-    printf("+");
-
-    //calls the printSpaces function with the rightSpace - 1 value
-
-    printSpaces(rightSpace-1);
-    printf("|");
-    printf("\n");
-
-    //iterate size times, creating the lower half to the Rhombus
-
-    for (int row = 0; row<size; row++)
+    //When adding 0 to a number, it does not change
+    else if(x1 == 0)
     {
-        //prints row times spaces using the function printSpaces
-
-        printSpaces(row);
-        printf("\\");
-
-        //prints leftSpace - 1 times spaces using the function printSpaces
-
-        printSpaces(leftSpace-1);
-        printf("*");
-
-        //prints rightSpace - 1 times spaces using the function printSpaces
-
-        printSpaces(rightSpace-1);
-        printf("/");
-
-        printf("\n");
-        leftSpace--;
-        rightSpace--;
+        sum = x2;
+        printf("%d\n", sum);
     }
+    //When adding 0 to a number, it does not change
+    else if(x2 == 0)
+    {
+        sum = x1;
+        printf("%d\n", sum);
+    }
+    //When one ofthe numbers is negative, we will set him as the "base" of the addition
+    else if(x1 > 0 && x2 < 0)
+    {
+        sum = x2;
+        for(int i = 0; i < x1; i++)
+        {
+            sum++;
+        }
+        printf("%d\n", sum);
+    }
+    //When one of the numbers is negative, we will set him as the "base" of the addition
+    else if(x1 < 0 && x2 > 0 )
+    {
+        sum = x1;
+        for(int i = 0; i < x2; i++)
+        {
+            sum++;
+        }
+        printf("%d\n", sum);
+    }
+    //When both of the numbers are negative it is like subtarcting 1 each time from the "base"
+    else
+    {
+        sum = x1;
+        for(int i = 0; i > x2; i--)
+        {
+            sum--;
+        }
+        printf("%d\n", sum);
+    } 
+}
+/************
+ * Function Name: multiplyNum
+ * Input: int x1, x2 (valid values are potientially infinite)
+ * Output: int product (valid values are potientially inifinite)
+ * Function Operation: 1. The user enters 2 nubmers.
+ *                     2. The function uses the algorithm of adding the number to the sum the times of the other value.
+ *                     3. If 0 of the numbers is 0 the function prints out 0.
+ *                     4. If one of the nubmers is negative the function reverses it, multiply the numbers,
+ *                        and then reverse back the product.
+ *                     5. If both of the numbers are negative the function reverses them both and the multiply them
+ **************/
+void multiplyNum()
+{
+    int x1, x2, product = 0; // Product = becuase the first itteration will be num*1
+    printf("Enter two numbers:\n");
+    scanf("%d%d", &x1, &x2);
+    //When multiplying in 0 the product will always be 0, regradles to the other number
+    if (x1 == 0 || x2 == 0)
+    {
+        product = 0;
+        printf("%d\n", product);
+    }
+    //When one of the number is negative
+    else if(x1 > 0 && x2 < 0)
+    {
+        x2 = ~x2+1;
+        for(int i = 0; i < x2; i++)
+        {
+            product += x1;
+        }
+        product = ~product+1;
+        printf("%d\n", product);
+    }
+    //When of the numbers is negative
+    else if(x1 < 0 && x2 > 0)
+    {
+        x1 = ~x1+1;
+        for(int i = 0; i < x1; i++)
+        {
+            product += x2;
+        }
+        product = ~product+1;
+        printf("%d\n", product);
+    }
+    //When both numbers are negative
+    else if(x1 < 0 && x2 < 0)
+    {
+        x1 = ~x1 + 1;
+        x2 = ~x2 + 1;
+        for(int i = 0; i < x1; i++)
+        {
+            product += x2;
+        }
+        printf("%d\n", product);
+    }
+    //When both are positive
+    else
+    {       
+        for(int i = 0; i < x2; i++)
+        {
+            product += x1;
+        }
+        printf("%d\n", product);
+    }    
 }
 
-
-/****************************************
- * function Name: printSpaces
- * Input: number of spaces >=  0
- * Output: prints n spaces
- * Function operation: takes n number from user and prints n times spaces
- ******************************************/
-
-
-void printSpaces(int number)
+/*******
+ * Function Name: main
+ * Input: int choice
+ * Output: none
+ * Function Opertation: Acts as a menu. 
+ *                      Gets a chioce number from the user and according calls a function,
+ *                      prints an error or is closed.
+ *********/
+int main()
 {
-    if (number<0)
+    char userChoice;
+    do
     {
-        return;
-    }
-    for (int i = 0; i<number; i++)
-    {
-        printf(" ");
-    }
+        printf("Choose an option:\n1. Rhombus\n2. Base 20 to Decimal\n3. Base to Decimal\n"
+                "4. Pow2\n5. Different bits\n6. Add\n7. Multiply\n0. Exit\n");
+        scanf(" %c", &userChoice);
+        switch(userChoice)
+        {
+            case '1':
+                drawRhombus();
+                break;
+            case '2':
+                base20toDecimal();
+                break;
+            case '3':
+                baseToDecimal();
+                break;
+            case '4':
+                pow2();
+                break;
+            case '5':
+                differentBits();
+                break;
+            case '6':
+                addNumbers();
+                break;
+            case '7':
+                multiplyNum();
+                break;
+            case '0':
+                break;
+            default:
+                printf("Wrong Option!\n");
+                break;
+        }
+    } while (userChoice != '0');
+    
 }
