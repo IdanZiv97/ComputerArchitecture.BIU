@@ -1,4 +1,6 @@
 run_all: run_regular run_o0 run_o1 run_o2 run_o3
+		mkdir "dissasembly_files"
+		mv *txt dissasembly_files
 
 run_regular:
 			gcc -g MyEx.c -o MyEx.out && objdump -d MyEx.out > regular.txt
