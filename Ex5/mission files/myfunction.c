@@ -1,7 +1,7 @@
-#include <stdbool.h>
-#include "showBMP.c"
 #include "readBMP.h"
+#include <stdbool.h>
 #include "writeBMP.h"
+#include "showBMP.c"
 
 typedef struct {
    unsigned char red;
@@ -192,7 +192,6 @@ void doConvolution(Image *image, int kernelSize, int kernel[kernelSize][kernelSi
 
 	pixel* pixelsImg = malloc(m*n*sizeof(pixel));
 	pixel* backupOrg = malloc(m*n*sizeof(pixel));
-
 	charsToPixels(image, pixelsImg);
 	copyPixels(pixelsImg, backupOrg);
 
