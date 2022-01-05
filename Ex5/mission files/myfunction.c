@@ -1,4 +1,7 @@
-#include <stdbool.h> 
+#include <stdbool.h>
+#include "showBMP.c"
+#include "readBMP.h"
+#include "writeBMP.h"
 
 typedef struct {
    unsigned char red;
@@ -15,17 +18,17 @@ typedef struct {
 
 
 /* Compute min and max of two integers, respectively */
-int min(int a, int b) { return (a < b ? a : b); }
-int max(int a, int b) { return (a > b ? a : b); }
+int min(int a, int b) { return (a < b ? a : b); } // create inline macro command
+int max(int a, int b) { return (a > b ? a : b); } // create inline macro
 
-int calcIndex(int i, int j, int n) {
+int calcIndex(int i, int j, int n) { // can be done inline waste of stack frame memory
 	return ((i)*(n)+(j));
 }
 
 /*
  * initialize_pixel_sum - Initializes all fields of sum to 0
  */
-void initialize_pixel_sum(pixel_sum *sum) {
+void initialize_pixel_sum(pixel_sum *sum) { // do inline
 	sum->red = sum->green = sum->blue = 0;
 	// sum->num = 0;
 	return;
@@ -36,8 +39,8 @@ void initialize_pixel_sum(pixel_sum *sum) {
  */
 static void assign_sum_to_pixel(pixel *current_pixel, pixel_sum sum, int kernelScale) {
 
-	// divide by kernel's weight
-	sum.red = sum.red / kernelScale;
+	// divide by kernel's weight NOTE: in sharpen this step is not needed because we divide by 1
+	sum.red = sum.red / kernelScale; 
 	sum.green = sum.green / kernelScale;
 	sum.blue = sum.blue / kernelScale;
 
