@@ -5,3 +5,4 @@
 *.o
 *.txt
 Ex5/my solution/*
+!Ex5/my solution/myfunction.c
