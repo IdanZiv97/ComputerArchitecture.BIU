@@ -1,4 +1,8 @@
-#include <stdbool.h> 
+#include <stdbool.h>
+#include <stdlib.h>
+
+#define RETURN_MIN(a, b) ((a > b) ? b : a);
+#define RETURN_MAX(a, b) ((a > b) ? a : b);
 
 typedef struct {
    unsigned char red;
@@ -240,45 +244,39 @@ void blurWithNoFilter(Image *image) {
 		//since we refferce the rows index for each column we will calculate them once
 		// we calculate the offset
 		prevRow = (row-1) * sizeOfRow;
-		currRow = sizeOfRow;
+		currRow = row * sizeOfRow;
 		nextRow = (row + 1) * sizeOfRow;
 		//we itterate in jumps of 3 since each pixel is 3 chars
 		for (column = 3; column < sizeOfRow -3; column += 3) { //column is the index of the pixel in the center of the square
 			//calculate the offset of colors from each row, the actual color's value is calculated by adding the row offset
 			// this way we can calculate the red value of each pixel in each row
-			currRed = column; // maybe if we won't create another variable we can improve run time?
-			currGreen = currRed + 1;
-			currBlue = currGreen + 2;
-			prevRed = currRed - 3;
-			prevGreen = prevRed + 1;
-			prevBlue = prevGreen + 1;
-			nextRed = currRed + 3;
-			nextGreen = currRed + 1;
-			nextBlue = nextGreen + 1;
+			currRed = column;
+			currGreen = column + 1;
+			currBlue = column + 2;
+			prevRed = column - 3;
+			prevGreen = column -2;
+			prevBlue = column -1;
+			nextRed = column + 3;
+			nextGreen = column + 4;
+			nextBlue = column + 5;
 			//Calculate the sum of all the red values from the border of the kernel
 			// The Reds Value
 			//first row
-			sumRedsValue += imageCopy[prevRow + prevRed] + imageCopy[prevRow + currRed] + imageCopy[prevRow + nextRed];
-			//second row, execpt the middle value
-			sumRedsValue += imageCopy[currRow + prevRed] + imageCopy[currRow + currRed] + imageCopy[currRow + nextRed];
-			//third row
-			sumRedsValue += imageCopy[nextRow + prevRed] + imageCopy[nextRow + currRed] + imageCopy[nextRow + nextRed];
+			sumRedsValue = imageCopy[prevRow + prevRed] + imageCopy[prevRow + currRed] + imageCopy[prevRow + nextRed] +
+			imageCopy[currRow + prevRed] + imageCopy[currRow + currRed] + imageCopy[currRow + nextRed] + 
+			imageCopy[nextRow + prevRed] + imageCopy[nextRow + currRed] + imageCopy[nextRow + nextRed];
 
 			//The greens value
 			//first row
-			sumGreensValue += imageCopy[prevRow + prevGreen] + imageCopy[prevRow + currGreen] + imageCopy[prevRow + nextGreen];
-			//second row, execpt the middle value
-			sumGreensValue += imageCopy[currRow + prevGreen] + imageCopy[currRow + currGreen] + imageCopy[currRow + nextGreen];
-			//third row
-			sumGreensValue += imageCopy[nextRow + prevGreen] + imageCopy[nextRow + currGreen] + imageCopy[nextRow + nextGreen];
+			sumGreensValue = imageCopy[prevRow + prevGreen] + imageCopy[prevRow + currGreen] + imageCopy[prevRow + nextGreen] +
+			imageCopy[currRow + prevGreen] + imageCopy[currRow + currGreen] + imageCopy[currRow + nextGreen] + 
+			imageCopy[nextRow + prevGreen] + imageCopy[nextRow + currGreen] + imageCopy[nextRow + nextGreen];
 
 			//The blues value
 			//first row
-			sumBluesValue += imageCopy[prevRow + prevBlue] + imageCopy[prevRow + currBlue] + imageCopy[prevRow + nextBlue];
-			//second row, execpt the middle value
-			sumBluesValue += imageCopy[currRow + prevBlue] + imageCopy[currRow + currBlue] + imageCopy[currRow + nextBlue];
-			//third row
-			sumBluesValue += imageCopy[nextRow + prevBlue] + imageCopy[nextRow + currBlue] + imageCopy[nextRow + nextBlue];
+			sumBluesValue = imageCopy[prevRow + prevBlue] + imageCopy[prevRow + currBlue] + imageCopy[prevRow + nextBlue] + 
+			imageCopy[currRow + prevBlue] + imageCopy[currRow + currBlue] + imageCopy[currRow + nextBlue] + 
+			imageCopy[nextRow + prevBlue] + imageCopy[nextRow + currBlue] + imageCopy[nextRow + nextBlue];
 
 			//assign the values
 			workCopy[currRow + currRed] = (unsigned char) (sumRedsValue / 9);
@@ -286,6 +284,7 @@ void blurWithNoFilter(Image *image) {
 			workCopy[currRow + currBlue] = (unsigned char) (sumBluesValue / 9);
 		}
 	}
+	free(imageCopy);
 }
 
 
@@ -297,117 +296,117 @@ void blurWithNoFilter(Image *image) {
  * proper comaprisons.
  * Also, this time we divied the sum by 7
  */
-void blurWithFilter(Image *image) {
-	int imageSize = n * m; // globals - maybe changing them to locals will improve runtime?
-	int numberOfChars = imageSize * 3; // try to optimize 
-	// create the reference to the image as a continuous sequence of chars
-	unsigned char *imageCopy = malloc(numberOfChars);
-	unsigned char *workCopy = image->data;
-	memcpy(imageCopy, workCopy, numberOfChars);
-	// frequently used variables
-	int prevRow, currRow, nextRow; // since we work in 3*3 squares
-	// we need to create variables to colors variables for the rows
-	int prevRed, currRed, nextRed;
-	int prevBlue, currBlue, nextBlue;
-	int prevGreen, currGreen, nextGreen;
-	//create maximum value;
-	int maxPixelIntensity = -1, minPixelIntensity = 766;
-	int minRed, minGreen, minBlue;
-	int maxRed, maxGreen, maxBlue;
-	//pixelij is the kernel[i-1][j-1] pixel
-	int pixel11, pixel12, pixel13;
-	int pixel21, pixel22, pixel23;
-	int pixel31, pixel32, pixel33;
-	//sum of colors value
-	int sumRedsValue = 0, sumGreensValue = 0, sumBluesValue = 0, totalSum;
-	//set the max and min value to arbitray values that are higher/lower from the max and min values respectivley
-	int row, column;
-	int sizeOfRow = m * 3;
-	for (row = 1; row < m - 1; ++i) {
-		currRed = column; // maybe if we won't create another variable we can improve run time?
-		currGreen = currRed + 1;
-		currBlue = currGreen + 2;
-		prevRed = currRed - 3;
-		prevGreen = prevRed + 1;
-		prevBlue = prevGreen + 1;
-		nextRed = currRed + 3;
-		nextGreen = currRed + 1;
-		nextBlue = nextGreen + 1;
-		for (column = 3; column < sizeOfRow - 3; column += 3) {
-			//calculate the offset of colors from each row, the actual color's value is calculated by adding the row offset
-			// this way we can calculate the red value of each pixel in each row
-			currRed = column; // maybe if we won't create another variable we can improve run time?
-			currGreen = currRed + 1;
-			currBlue = currGreen + 2;
-			prevRed = currRed - 3;
-			prevGreen = prevRed + 1;
-			prevBlue = prevGreen + 1;
-			nextRed = currRed + 3;
-			nextGreen = currRed + 1;
-			nextBlue = nextGreen + 1;
-			//calculate the first row pixles and check for min max value
-			pixel11 = imageCopy[prevRow + prevRed] + imageCopy[prevRow + prevGreen] + imageCopy[prevRow + prevBlue];
-			if (pixel11 > maxPixelIntensity) {
-				maxRed = imageCopy[prevRow + prevRed];
-				maxGreen = imageCopy[prevRow + prevRed];
-			}
-			maxPixelIntensity = (pixel11 > maxPixelIntensity) : pixel11 ? maxPixelIntensity;
-			minPixelIntensity = (pixel11 <= minPixelIntensity) : pixel11 ? minPixelIntensity;
-			pixel12 = imageCopy[prevRow + currRed] + imageCopy[prevRow + currGreen] + imageCopy[prevRow + currGreen];
-			maxPixelIntensity = (pixel12 > maxPixelIntensity) : pixel12 ? maxPixelIntensity;
-			minPixelIntensity = (pixel12 <= minPixelIntensity) : pixel12 ? minPixelIntensity;
-			pixel13 = imageCopy[prevRow + nextRed] + imageCopy[prevRow + nextGreen] + imageCopy[prevRow + nextBlue];
-			maxPixelIntensity = (pixel13 > maxPixelIntensity) : pixel13 ? maxPixelIntensity;
-			minPixelIntensity = (pixel13 <= minPixelIntensity) : pixel13 ? minPixelIntensity;
-			//calculate the 2nd row pixels
-			pixel21 = imageCopy[currRow + prevRed] + imageCopy[currRow + prevGreen] + imageCopy[currRow + prevBlue];
-			maxPixelIntensity = (pixel21 > maxPixelIntensity) : pixel21 ? maxPixelIntensity;
-			minPixelIntensity = (pixel21 <= minPixelIntensity) : pixel21 ? minPixelIntensity;
-			pixel22 = imageCopy[currRow + currRed] + imageCopy[currRow + currGreen] + imageCopy[currRow + currGreen];
-			maxPixelIntensity = (pixel22 > maxPixelIntensity) : pixel22 ? maxPixelIntensity;
-			minPixelIntensity = (pixel22 <= minPixelIntensity) : pixel22 ? minPixelIntensity;
-			pixel23 = imageCopy[currRow + nextRed] + imageCopy[currRow + nextGreen] + imageCopy[currRow + nextBlue];
-			maxPixelIntensity = (pixel23 > maxPixelIntensity) : pixel23 ? maxPixelIntensity;
-			minPixelIntensity = (pixel23 <= minPixelIntensity) : pixel23 ? minPixelIntensity;
-			//calcualte the 3rd row pixels
-			pixel31 = imageCopy[nextRow + prevRed] + imageCopy[nextRow + prevGreen] + imageCopy[nextRow + prevBlue];
-			maxPixelIntensity = (pixel31 > maxPixelIntensity) : pixel31 ? maxPixelIntensity;
-			minPixelIntensity = (pixel31 <= minPixelIntensity) : pixel31 ? minPixelIntensity;
-			pixel32 = imageCopy[nextRow + currRed] + imageCopy[nextRow + currGreen] + imageCopy[nextRow + currGreen];
-			maxPixelIntensity = (pixel32 > maxPixelIntensity) : pixel32 ? maxPixelIntensity;
-			minPixelIntensity = (pixel32 <= minPixelIntensity) : pixel32 ? minPixelIntensity;
-			pixel33 = imageCopy[nextRow + nextRed] + imageCopy[nextRow + nextGreen] + imageCopy[nextRow + nextBlue];
-			maxPixelIntensity = (pixel33 > maxPixelIntensity) : pixel33 ? maxPixelIntensity;
-			minPixelIntensity = (pixel33 <= minPixelIntensity) : pixel33 ? minPixelIntensity;
+// void blurWithFilter(Image *image) {
+// 	int imageSize = n * m; // globals - maybe changing them to locals will improve runtime?
+// 	int numberOfChars = imageSize * 3; // try to optimize 
+// 	// create the reference to the image as a continuous sequence of chars
+// 	unsigned char *imageCopy = malloc(numberOfChars);
+// 	unsigned char *workCopy = image->data;
+// 	memcpy(imageCopy, workCopy, numberOfChars);
+// 	// frequently used variables
+// 	int prevRow, currRow, nextRow; // since we work in 3*3 squares
+// 	// we need to create variables to colors variables for the rows
+// 	int prevRed, currRed, nextRed;
+// 	int prevBlue, currBlue, nextBlue;
+// 	int prevGreen, currGreen, nextGreen;
+// 	//create maximum value;
+// 	int maxPixelIntensity = -1, minPixelIntensity = 766;
+// 	int minRed, minGreen, minBlue;
+// 	int maxRed, maxGreen, maxBlue;
+// 	//pixelij is the kernel[i-1][j-1] pixel
+// 	int pixel11, pixel12, pixel13;
+// 	int pixel21, pixel22, pixel23;
+// 	int pixel31, pixel32, pixel33;
+// 	//sum of colors value
+// 	int sumRedsValue = 0, sumGreensValue = 0, sumBluesValue = 0, totalSum;
+// 	//set the max and min value to arbitray values that are higher/lower from the max and min values respectivley
+// 	int row, column;
+// 	int sizeOfRow = m * 3;
+// 	for (row = 1; row < m - 1; ++row) {
+// 		currRed = column; // maybe if we won't create another variable we can improve run time?
+// 		currGreen = currRed + 1;
+// 		currBlue = currGreen + 2;
+// 		prevRed = currRed - 3;
+// 		prevGreen = prevRed + 1;
+// 		prevBlue = prevGreen + 1;
+// 		nextRed = currRed + 3;
+// 		nextGreen = currRed + 1;
+// 		nextBlue = nextGreen + 1;
+// 		for (column = 3; column < sizeOfRow - 3; column += 3) {
+// 			//calculate the offset of colors from each row, the actual color's value is calculated by adding the row offset
+// 			// this way we can calculate the red value of each pixel in each row
+// 			currRed = column; // maybe if we won't create another variable we can improve run time?
+// 			currGreen = currRed + 1;
+// 			currBlue = currGreen + 2;
+// 			prevRed = currRed - 3;
+// 			prevGreen = prevRed + 1;
+// 			prevBlue = prevGreen + 1;
+// 			nextRed = currRed + 3;
+// 			nextGreen = currRed + 1;
+// 			nextBlue = nextGreen + 1;
+// 			//calculate the first row pixles and check for min max value
+// 			pixel11 = imageCopy[prevRow + prevRed] + imageCopy[prevRow + prevGreen] + imageCopy[prevRow + prevBlue];
+// 			if (pixel11 > maxPixelIntensity) {
+// 				maxRed = imageCopy[prevRow + prevRed];
+// 				maxGreen = imageCopy[prevRow + prevRed];
+// 			}
+// 			maxPixelIntensity = (pixel11 > maxPixelIntensity) : pixel11 ? maxPixelIntensity;
+// 			minPixelIntensity = (pixel11 <= minPixelIntensity) : pixel11 ? minPixelIntensity;
+// 			pixel12 = imageCopy[prevRow + currRed] + imageCopy[prevRow + currGreen] + imageCopy[prevRow + currGreen];
+// 			maxPixelIntensity = (pixel12 > maxPixelIntensity) : pixel12 ? maxPixelIntensity;
+// 			minPixelIntensity = (pixel12 <= minPixelIntensity) : pixel12 ? minPixelIntensity;
+// 			pixel13 = imageCopy[prevRow + nextRed] + imageCopy[prevRow + nextGreen] + imageCopy[prevRow + nextBlue];
+// 			maxPixelIntensity = (pixel13 > maxPixelIntensity) : pixel13 ? maxPixelIntensity;
+// 			minPixelIntensity = (pixel13 <= minPixelIntensity) : pixel13 ? minPixelIntensity;
+// 			//calculate the 2nd row pixels
+// 			pixel21 = imageCopy[currRow + prevRed] + imageCopy[currRow + prevGreen] + imageCopy[currRow + prevBlue];
+// 			maxPixelIntensity = (pixel21 > maxPixelIntensity) : pixel21 ? maxPixelIntensity;
+// 			minPixelIntensity = (pixel21 <= minPixelIntensity) : pixel21 ? minPixelIntensity;
+// 			pixel22 = imageCopy[currRow + currRed] + imageCopy[currRow + currGreen] + imageCopy[currRow + currGreen];
+// 			maxPixelIntensity = (pixel22 > maxPixelIntensity) : pixel22 ? maxPixelIntensity;
+// 			minPixelIntensity = (pixel22 <= minPixelIntensity) : pixel22 ? minPixelIntensity;
+// 			pixel23 = imageCopy[currRow + nextRed] + imageCopy[currRow + nextGreen] + imageCopy[currRow + nextBlue];
+// 			maxPixelIntensity = (pixel23 > maxPixelIntensity) : pixel23 ? maxPixelIntensity;
+// 			minPixelIntensity = (pixel23 <= minPixelIntensity) : pixel23 ? minPixelIntensity;
+// 			//calcualte the 3rd row pixels
+// 			pixel31 = imageCopy[nextRow + prevRed] + imageCopy[nextRow + prevGreen] + imageCopy[nextRow + prevBlue];
+// 			maxPixelIntensity = (pixel31 > maxPixelIntensity) : pixel31 ? maxPixelIntensity;
+// 			minPixelIntensity = (pixel31 <= minPixelIntensity) : pixel31 ? minPixelIntensity;
+// 			pixel32 = imageCopy[nextRow + currRed] + imageCopy[nextRow + currGreen] + imageCopy[nextRow + currGreen];
+// 			maxPixelIntensity = (pixel32 > maxPixelIntensity) : pixel32 ? maxPixelIntensity;
+// 			minPixelIntensity = (pixel32 <= minPixelIntensity) : pixel32 ? minPixelIntensity;
+// 			pixel33 = imageCopy[nextRow + nextRed] + imageCopy[nextRow + nextGreen] + imageCopy[nextRow + nextBlue];
+// 			maxPixelIntensity = (pixel33 > maxPixelIntensity) : pixel33 ? maxPixelIntensity;
+// 			minPixelIntensity = (pixel33 <= minPixelIntensity) : pixel33 ? minPixelIntensity;
 
-			//Calculate the total sum of pixels
-			// The Reds Value
-			//first row
-			sumRedsValue += imageCopy[prevRow + prevRed] + imageCopy[prevRow + currRed] + imageCopy[prevRow + nextRed];
-			//second row, execpt the middle value
-			sumRedsValue += imageCopy[currRow + prevRed] + imageCopy[currRow + currRed] + imageCopy[currRow + nextRed];
-			//third row
-			sumRedsValue += imageCopy[nextRow + prevRed] + imageCopy[nextRow + currRed] + imageCopy[nextRow + nextRed];
-			//The greens value
-			//first row
-			sumGreensValue += imageCopy[prevRow + prevGreen] + imageCopy[prevRow + currGreen] + imageCopy[prevRow + nextGreen];
-			//second row, execpt the middle value
-			sumGreensValue += imageCopy[currRow + prevGreen] + imageCopy[currRow + currGreen] + imageCopy[currRow + nextGreen];
-			//third row
-			sumGreensValue += imageCopy[nextRow + prevGreen] + imageCopy[nextRow + currGreen] + imageCopy[nextRow + nextGreen];
+// 			//Calculate the total sum of pixels
+// 			// The Reds Value
+// 			//first row
+// 			sumRedsValue += imageCopy[prevRow + prevRed] + imageCopy[prevRow + currRed] + imageCopy[prevRow + nextRed];
+// 			//second row, execpt the middle value
+// 			sumRedsValue += imageCopy[currRow + prevRed] + imageCopy[currRow + currRed] + imageCopy[currRow + nextRed];
+// 			//third row
+// 			sumRedsValue += imageCopy[nextRow + prevRed] + imageCopy[nextRow + currRed] + imageCopy[nextRow + nextRed];
+// 			//The greens value
+// 			//first row
+// 			sumGreensValue += imageCopy[prevRow + prevGreen] + imageCopy[prevRow + currGreen] + imageCopy[prevRow + nextGreen];
+// 			//second row, execpt the middle value
+// 			sumGreensValue += imageCopy[currRow + prevGreen] + imageCopy[currRow + currGreen] + imageCopy[currRow + nextGreen];
+// 			//third row
+// 			sumGreensValue += imageCopy[nextRow + prevGreen] + imageCopy[nextRow + currGreen] + imageCopy[nextRow + nextGreen];
 
-			//The blues value
-			//first row
-			sumBluesValue += imageCopy[prevRow + prevBlue] + imageCopy[prevRow + currBlue] + imageCopy[prevRow + nextBlue];
-			//second row, execpt the middle value
-			sumBluesValue += imageCopy[currRow + prevBlue] + imageCopy[currRow + currBlue] + imageCopy[currRow + nextBlue];
-			//third row
-			sumBluesValue += imageCopy[nextRow + prevBlue] + imageCopy[nextRow + currBlue] + imageCopy[nextRow + nextBlue];
+// 			//The blues value
+// 			//first row
+// 			sumBluesValue += imageCopy[prevRow + prevBlue] + imageCopy[prevRow + currBlue] + imageCopy[prevRow + nextBlue];
+// 			//second row, execpt the middle value
+// 			sumBluesValue += imageCopy[currRow + prevBlue] + imageCopy[currRow + currBlue] + imageCopy[currRow + nextBlue];
+// 			//third row
+// 			sumBluesValue += imageCopy[nextRow + prevBlue] + imageCopy[nextRow + currBlue] + imageCopy[nextRow + nextBlue];
 			
 			
-		}
-	}
-}
+// 		}
+// 	}
+// }
 
 
 
@@ -453,45 +452,39 @@ void sharpen(Image *image) {
 		//since we refferce the rows index for each column we will calculate them once
 		// we calculate the offset
 		prevRow = (row-1) * sizeOfRow;
-		currRow = sizeOfRow;
+		currRow = row * sizeOfRow;
 		nextRow = (row + 1) * sizeOfRow;
 		//we itterate in jumps of 3 since each pixel is 3 chars
-		for (column = 3; column < sizeOfRow -3; column += 3) { //column is the index of the pixel in the center of the square
+		for (column = 3; column < sizeOfRow - 3; column += 3) { //column is the index of the pixel in the center of the square
 			//calculate the offset of colors from each row, the actual color's value is calculated by adding the row offset
 			// this way we can calculate the red value of each pixel in each row
 			currRed = column;
-			currGreen = currRed + 1;
-			currBlue = currGreen + 2;
-			prevRed = currRed - 3;
-			prevGreen = prevRed + 1;
-			prevBlue = prevGreen + 1;
-			nextRed = currRed + 3;
-			nextGreen = currRed + 1;
-			nextBlue = nextGreen + 1;
+			currGreen = column + 1;
+			currBlue = column + 2;
+			prevRed = column - 3;
+			prevGreen = column -2;
+			prevBlue = column -1;
+			nextRed = column + 3;
+			nextGreen = column + 4;
+			nextBlue = column + 5;
 			//Calculate the sum of all the red values from the border of the kernel
 			// The Reds Value
 			//first row
-			borderRedsValue += imageCopy[prevRow + prevRed] + imageCopy[prevRow + currRed] + imageCopy[prevRow + nextRed];
-			//second row, execpt the middle value
-			borderRedsValue += imageCopy[currRow + prevRed] + imageCopy[currRow + nextRed];
-			//third row
-			borderRedsValue += imageCopy[nextRow + prevRed] + imageCopy[nextRow + currRed] + imageCopy[nextRow + nextRed];
+			borderRedsValue = imageCopy[prevRow + prevRed] + imageCopy[prevRow + currRed] + imageCopy[prevRow + nextRed] + 
+			imageCopy[currRow + prevRed] + imageCopy[currRow + nextRed] + imageCopy[nextRow + prevRed] +
+			imageCopy[nextRow + currRed] + imageCopy[nextRow + nextRed];
 
 			//The greens value
 			//first row
-			borderGreensValue += imageCopy[prevRow + prevGreen] + imageCopy[prevRow + currGreen] + imageCopy[prevRow + nextGreen];
-			//second row, execpt the middle value
-			borderGreensValue += imageCopy[currRow + prevGreen] + imageCopy[currRow + nextGreen];
-			//third row
-			borderGreensValue += imageCopy[nextRow + prevGreen] + imageCopy[nextRow + currGreen] + imageCopy[nextRow + nextGreen];
+			borderGreensValue = imageCopy[prevRow + prevGreen] + imageCopy[prevRow + currGreen] + imageCopy[prevRow + nextGreen] + 
+			imageCopy[currRow + prevGreen] + imageCopy[currRow + nextGreen] + 
+			imageCopy[nextRow + prevGreen] + imageCopy[nextRow + currGreen] + imageCopy[nextRow + nextGreen];
 
 			//The blues value
 			//first row
-			borderBluesValue += imageCopy[prevRow + prevBlue] + imageCopy[prevRow + currBlue] + imageCopy[prevRow + nextBlue];
-			//second row, execpt the middle value
-			borderBluesValue += imageCopy[currRow + prevBlue] + imageCopy[currRow + nextBlue];
-			//third row
-			borderBluesValue += imageCopy[nextRow + prevBlue] + imageCopy[nextRow + currBlue] + imageCopy[nextRow + nextBlue];
+			borderBluesValue = imageCopy[prevRow + prevBlue] + imageCopy[prevRow + currBlue] + imageCopy[prevRow + nextBlue] +
+			imageCopy[currRow + prevBlue] + imageCopy[currRow + nextBlue] + 
+			imageCopy[nextRow + prevBlue] + imageCopy[nextRow + currBlue] + imageCopy[nextRow + nextBlue];
 
 			//Calculate the middle cell of the kernels value
 			centerRedValue = imageCopy[currRow + currRed] * 9;
@@ -501,23 +494,40 @@ void sharpen(Image *image) {
 			// now we need to assign the calcualted value to the original image. First, since the kernelScale is 1 there is no
 			// need to divide the result, since number / 1 == number. Second, there is a chance the pixel calculated is lower the 0 or higer than 255
 			// so there is a need to check for that
-			int redValueOfPixel = (centerRedValue - borderRedsValue > 0) ? centerRedValue - borderRedsValue : 0;
-			redValueOfPixel = (redValueOfPixel > 255) ? redValueOfPixel : 255;
-			int greenValueOfPixel = (centerGreenValue - borderGreensValue > 0) ? centerGreenValue - borderGreensValue : 0;
-			greenValueOfPixel = (greenValueOfPixel > 255) ? greenValueOfPixel : 255;
-			int blueValueOfPixel = (centerBlueValue - borderBluesValue > 0) ? centerBlueValue - borderBluesValue : 0;
-			blueValueOfPixel = (blueValueOfPixel > 255) ? blueValueOfPixel : 255;
+			int redValueOfPixel, greenValueOfPixel, blueValueOfPixel;
+			if (centerRedValue - borderRedsValue > 0) {
+				if (centerRedValue - borderRedsValue < 255) {
+					redValueOfPixel = centerRedValue - borderRedsValue;
+				} else {
+					redValueOfPixel = 255;
+				}
+			} else {
+				redValueOfPixel = 0;
+			}
+			if (centerGreenValue - borderGreensValue > 0) {
+				if (centerGreenValue - borderGreensValue < 255) {
+					greenValueOfPixel = centerGreenValue - borderGreensValue;
+				} else {
+					greenValueOfPixel = 255;
+				}
+			} else {
+				greenValueOfPixel = 0;
+			}
+			if (centerBlueValue - borderBluesValue > 0) {
+				if (centerBlueValue - borderBluesValue < 255) {
+					blueValueOfPixel = centerBlueValue - borderBluesValue;
+				} else {
+					blueValueOfPixel = 255;
+				}
+			} else {
+				blueValueOfPixel = 0;
+			}
 			//assign the values
 			workCopy[currRow + currRed] = (unsigned char) redValueOfPixel;
 			workCopy[currRow + currGreen] = (unsigned char) greenValueOfPixel;
 			workCopy[currRow + currBlue] = (unsigned char) blueValueOfPixel;
 		}
 	}
-
-
-
-
-	//so i won't forget - free the memcpy
 	free(imageCopy);
 }
 
