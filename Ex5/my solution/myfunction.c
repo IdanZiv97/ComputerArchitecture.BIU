@@ -3,9 +3,14 @@
 
 #define MIN_COLOR_VALUE 0
 #define MAX_COLOR_VALUE 255
+#define MIN_INTENSITY -1
+#define MAX_INTENSITY 766
 #define MIN(a, b) (a > b ? b : a)
 #define MAX(a, b) (a > b ? a : b)
 #define DIV_BY9(val) ((val * 0xe38f) >> 19)
+// (((val * 0x2493) >> 16) + val) >> 3
+#define DIV_BY7(val) ((((val * 0x2493) >> 16) + val) >> 3)
+#define INT(val) ((int) val)
 
 typedef struct {
    unsigned char red;
@@ -17,7 +22,7 @@ typedef struct {
     int red;
     int green;
     int blue;
-    // int num;
+    int num;
 } pixel_sum;
 
 
@@ -46,7 +51,7 @@ static void assign_sum_to_pixel(pixel *current_pixel, pixel_sum sum, int kernelS
 
 	// truncate each pixel's color values to match the range [0,255]
 	current_pixel->red = (unsigned char) (MIN(MAX(sum.red, MIN_COLOR_VALUE), MAX_COLOR_VALUE));
-	current_pixel->green = (unsigned char) (MIN(MAX(sum.green, MIN_COL), 255));
+	current_pixel->green = (unsigned char) (MIN(MAX(sum.green, MIN_COLOR_VALUE), 255));
 	current_pixel->blue = (unsigned char) (MIN(MAX(sum.blue, 0), 255));
 	return;
 }
@@ -221,8 +226,62 @@ void doConvolution(Image *image, int kernelSize, int kernel[kernelSize][kernelSi
  */
 
 void blurWithNoFilter(Image *image) {
+	int imageSize = m * n;
+	int numOfPixels = imageSize + (imageSize << 1); // faster way to multiply by 3
+	register pixel *originalImage = (pixel *) image->data; //this way we refference 3 chars in one refernce instead of 1
+	register pixel *workingCopy = (pixel *) malloc(numOfPixels);
+	int minPixelIntensity = MAX_INTENSITY, maxPixelIntensity = MIN_INTENSITY;
+	pixel_sum valuesSum;
+	pixel currentPixel;
+	//copy the image
+	memcpy(workingCopy, originalImage, numOfPixels);
+	register int row, column, lastIndex;
+	lastIndex = m - 1; //the last index we can perfom applyKernel to, we know that m == n
+	/**
+	 * We will go over each pixel and created it convulation, we can calulate all the pixels in the square
+	 * also we need to eavluate each pixel
+	 * Note: pixelij is kernel[i][j]
+	 */
+	register int firstRow, secondRow, thirdRow; // pixel rows inside the kernel
+	for (row = 1; row < lastIndex; ++row) {
+		firstRow = (row - 1) * m;
+		secondRow = row * m;
+		thirdRow = (row + 1) * m;
+		for (column = 1; column < lastIndex; ++column) {
+			pixel pixel11 = workingCopy[firstRow];
+			pixel pixel12 = workingCopy[firstRow + 1];
+			pixel pixel13 = workingCopy[firstRow + 2];
+			pixel pixel21 = workingCopy[secondRow];
+			pixel pixel22 = workingCopy[secondRow + 1];
+			pixel pixel23 = workingCopy[secondRow + 2];
+			pixel pixel31 = workingCopy[thirdRow];
+			pixel pixel32 = workingCopy[thirdRow + 1];
+			pixel pixel33 = workingCopy[thirdRow + 2];
+
+			valuesSum.red = INT(pixel11.red) + INT(pixel12.red) + INT(pixel13.red) + INT(pixel21.red) + INT(pixel22.red)
+			+ INT(pixel23.red) + INT(pixel31.red) + INT(pixel32.red) + INT(pixel33.red);
+
+			valuesSum.green = INT(pixel11.green) + INT(pixel12.green) + INT(pixel13.green) + INT(pixel21.green) + INT(pixel22.green)
+			+ INT(pixel23.green) + INT(pixel31.green) + INT(pixel32.green) + INT(pixel33.green);
+
+			valuesSum.blue = INT(pixel11.blue) + INT(pixel12.blue) + INT(pixel13.blue) + INT(pixel21.blue) + INT(pixel22.blue)
+			+ INT(pixel23.blue) + INT(pixel31.blue) + INT(pixel32.blue) + INT(pixel33.blue);
+
+			originalImage[secondRow + 1].red = (unsigned char) DIV_BY9(valuesSum.red);
+			originalImage[secondRow + 1].green = (unsigned char) DIV_BY9(valuesSum.green);
+			originalImage[secondRow + 1].blue = (unsigned char) DIV_BY9(valuesSum.blue);
+
+			currentPixel.red = (unsigned char) DIV_BY9(valuesSum.red);
+			currentPixel.green = (unsigned char) DIV_BY9(valuesSum.green);
+			currentPixel.blue = (unsigned char) DIV_BY9(valuesSum.blue);
+
+			originalImage[secondRow + 1] = currentPixel;
+	
+	// old implementation
+	/*
 	int imageSize = n * m; // globals - maybe changing them to locals will improve runtime?
-	int numberOfChars = imageSize + (imageSize << 1); // try to optimize 
+
+	int numberOfChars = imageSize + (imageSize << 1); // equals to imageSize * 3 
 	// create the reference to the image as a continuous sequence of chars
 	unsigned char *imageCopy = malloc(numberOfChars);
 	unsigned char *workCopy = image->data;
@@ -260,7 +319,7 @@ void blurWithNoFilter(Image *image) {
 			nextBlue = column + 5;
 			//Calculate the sum of all the red values from the border of the kernel
 			// The Reds Value
-			//first row
+			//first row							§	§				row * sizeOfRow(n) + column
 			sumRedsValue = imageCopy[prevRow + prevRed] + imageCopy[prevRow + column] + imageCopy[prevRow + nextRed] +
 			imageCopy[currRow + prevRed] + imageCopy[currRow + column] + imageCopy[currRow + nextRed] + 
 			imageCopy[nextRow + prevRed] + imageCopy[nextRow + column] + imageCopy[nextRow + nextRed];
@@ -283,7 +342,82 @@ void blurWithNoFilter(Image *image) {
 			workCopy[currRow + currBlue] = (unsigned char) DIV_BY9(sumBluesValue);
 		}
 	}
+	//free the malloc
+	*/
+		}
+	}
 }
+
+
+/**
+ * We will spare the unnecessary copy and casting of chars and pixels by utilizing the fact that the image data is already stored
+ * using a pointer to a countinuos data sequnce, using unsigned char*. We will reference the data as pixel* this way we can reach 
+ * all the data in one memory upload.
+ * We can set commonly used variables to a register this way we assure fast handling and access to them.
+ */
+
+void filterBlur(Image *image) {
+	int imageSize = m * n;
+	int numOfPixels = imageSize + (imageSize << 1); // faster way to multiply by 3
+	register pixel *originalImage = (pixel *) image->data; //this way we refference 3 chars in one refernce instead of 1
+	register pixel *workingCopy = (pixel *) malloc(numOfPixels);
+	int minPixelIntensity = MAX_INTENSITY, maxPixelIntensity = MIN_INTENSITY;
+	pixel_sum minIntesity, maxIntensity, valuesSum;
+	pixel currentPixel;
+	//copy the image
+	memcpy(workingCopy, originalImage, numOfPixels);
+	register int row, column, lastIndex;
+	lastIndex = m - 1; //the last index we can perfom applyKernel to, we know that m == n
+	/**
+	 * We will go over each pixel and created it convulation, we can calulate all the pixels in the square
+	 * also we need to eavluate each pixel
+	 * Note: pixelij is kernel[i][j]
+	 */
+	register int firstRow, secondRow, thirdRow; // pixel rows inside the kernel
+	for (row = 1; row < lastIndex; ++row) {
+		firstRow = (row - 1) * m;
+		secondRow = row * m;
+		thirdRow = (row + 1) * m;
+		for (column = 1; column < lastIndex; ++column) {
+			pixel pixel11 = workingCopy[firstRow];
+			pixel pixel12 = workingCopy[firstRow + 1];
+			pixel pixel13 = workingCopy[firstRow + 2];
+			pixel pixel21 = workingCopy[secondRow];
+			pixel pixel22 = workingCopy[secondRow + 1];
+			pixel pixel23 = workingCopy[secondRow + 2];
+			pixel pixel31 = workingCopy[thirdRow];
+			pixel pixel32 = workingCopy[thirdRow + 1];
+			pixel pixel33 = workingCopy[thirdRow + 2];
+
+			valuesSum.red = INT(pixel11.red) + INT(pixel12.red) + INT(pixel13.red) + INT(pixel21.red) + INT(pixel22.red)
+			+ INT(pixel23.red) + INT(pixel31.red) + INT(pixel32.red) + INT(pixel33.red);
+
+			valuesSum.green = INT(pixel11.green) + INT(pixel12.green) + INT(pixel13.green) + INT(pixel21.green) + INT(pixel22.green)
+			+ INT(pixel23.green) + INT(pixel31.green) + INT(pixel32.green) + INT(pixel33.green);
+
+			valuesSum.blue = INT(pixel11.blue) + INT(pixel12.blue) + INT(pixel13.blue) + INT(pixel21.blue) + INT(pixel22.blue)
+			+ INT(pixel23.blue) + INT(pixel31.blue) + INT(pixel32.blue) + INT(pixel33.blue);
+
+			/**
+			 * add min max intensity refference 
+			 */
+			originalImage[secondRow + 1].red = (unsigned char) DIV_BY7(valuesSum.red);
+			originalImage[secondRow + 1].green = (unsigned char) DIV_BY7(valuesSum.green);
+			originalImage[secondRow + 1].blue = (unsigned char) DIV_BY7(valuesSum.blue);
+		}
+	}
+	free(workingCopy);
+}
+
+
+
+
+
+
+
+
+
+
 
 
 /**
@@ -296,7 +430,7 @@ void blurWithNoFilter(Image *image) {
  */
 // void blurWithFilter(Image *image) {
 // 	int imageSize = n * m; // globals - maybe changing them to locals will improve runtime?
-// 	int numberOfChars = imageSize * 3; // try to optimize 
+// 	int numberOfChars = imageSize + (imageSize << 1); // try to optimize 
 // 	// create the reference to the image as a continuous sequence of chars
 // 	unsigned char *imageCopy = malloc(numberOfChars);
 // 	unsigned char *workCopy = image->data;
@@ -308,7 +442,7 @@ void blurWithNoFilter(Image *image) {
 // 	int prevBlue, currBlue, nextBlue;
 // 	int prevGreen, currGreen, nextGreen;
 // 	//create maximum value;
-// 	int maxPixelIntensity = -1, minPixelIntensity = 766;
+// 	int maxPixelIntensity = MIN_INTENSITY, minPixelIntensity = MAX_INTENSITY;
 // 	int minRed, minGreen, minBlue;
 // 	int maxRed, maxGreen, maxBlue;
 // 	//pixelij is the kernel[i-1][j-1] pixel
@@ -319,9 +453,9 @@ void blurWithNoFilter(Image *image) {
 // 	int sumRedsValue = 0, sumGreensValue = 0, sumBluesValue = 0, totalSum;
 // 	//set the max and min value to arbitray values that are higher/lower from the max and min values respectivley
 // 	int row, column;
-// 	int sizeOfRow = m * 3;
+// 	int sizeOfRow = m + (m << 1);
 // 	for (row = 1; row < m - 1; ++row) {
-// 		currRed = column; // maybe if we won't create another variable we can improve run time?
+// 		//currRed = column; // maybe if we won't create another variable we can improve run time?
 // 		currGreen = currRed + 1;
 // 		currBlue = currGreen + 2;
 // 		prevRed = currRed - 3;
@@ -333,15 +467,14 @@ void blurWithNoFilter(Image *image) {
 // 		for (column = 3; column < sizeOfRow - 3; column += 3) {
 // 			//calculate the offset of colors from each row, the actual color's value is calculated by adding the row offset
 // 			// this way we can calculate the red value of each pixel in each row
-// 			currRed = column; // maybe if we won't create another variable we can improve run time?
-// 			currGreen = currRed + 1;
-// 			currBlue = currGreen + 2;
-// 			prevRed = currRed - 3;
-// 			prevGreen = prevRed + 1;
-// 			prevBlue = prevGreen + 1;
-// 			nextRed = currRed + 3;
-// 			nextGreen = currRed + 1;
-// 			nextBlue = nextGreen + 1;
+// 			//currRed = column; // maybe if we won't create another variable we can improve run time?
+// 			currGreen = column + 1;
+// 			currBlue = column + 2;
+// 			prevRed = column - 3;
+// 			prevGreen = column -2;
+// 			prevBlue = column -1;
+// 			nextGreen = column + 4;
+// 			nextBlue = column + 5;
 // 			//calculate the first row pixles and check for min max value
 // 			pixel11 = imageCopy[prevRow + prevRed] + imageCopy[prevRow + prevGreen] + imageCopy[prevRow + prevBlue];
 // 			if (pixel11 > maxPixelIntensity) {
@@ -381,7 +514,6 @@ void blurWithNoFilter(Image *image) {
 // 			pixel33 = imageCopy[nextRow + nextRed] + imageCopy[nextRow + nextGreen] + imageCopy[nextRow + nextBlue];
 // 			maxPixelIntensity = (pixel33 > maxPixelIntensity) : pixel33 ? maxPixelIntensity;
 // 			minPixelIntensity = (pixel33 <= minPixelIntensity) : pixel33 ? minPixelIntensity;
-
 // 			//Calculate the total sum of pixels
 // 			// The Reds Value
 // 			//first row
@@ -397,16 +529,13 @@ void blurWithNoFilter(Image *image) {
 // 			sumGreensValue += imageCopy[currRow + prevGreen] + imageCopy[currRow + currGreen] + imageCopy[currRow + nextGreen];
 // 			//third row
 // 			sumGreensValue += imageCopy[nextRow + prevGreen] + imageCopy[nextRow + currGreen] + imageCopy[nextRow + nextGreen];
-
 // 			//The blues value
 // 			//first row
 // 			sumBluesValue += imageCopy[prevRow + prevBlue] + imageCopy[prevRow + currBlue] + imageCopy[prevRow + nextBlue];
 // 			//second row, execpt the middle value
 // 			sumBluesValue += imageCopy[currRow + prevBlue] + imageCopy[currRow + currBlue] + imageCopy[currRow + nextBlue];
 // 			//third row
-// 			sumBluesValue += imageCopy[nextRow + prevBlue] + imageCopy[nextRow + currBlue] + imageCopy[nextRow + nextBlue];
-			
-			
+// 			sumBluesValue += imageCopy[nextRow + prevBlue] + imageCopy[nextRow + currBlue] + imageCopy[nextRow + nextBlue];			
 // 		}
 // 	}
 // }
@@ -428,6 +557,59 @@ void blurWithNoFilter(Image *image) {
  * the calulate the prodcut of the the middle cell of the kernel by 9 and subtract the two, then determine which is greater,
  * since the result can be really high or neegative we will need to use the min and max functions with the bounds
  */
+void sharpenPixels(Image *image) {
+	int imageSize = m * n;
+	int numOfPixels = imageSize + (imageSize << 1);
+	register pixel *originalImage = image->data;
+	register pixel *workingCopy = malloc(numOfPixels);
+	register int row, column, lastIndex = m - 1;
+	pixel currentPixel;
+	pixel_sum borders;
+	pixel_sum centerPixel;
+	register int firstRow, secondRow, thirdRow;
+	for (row = 1; row < lastIndex; ++row) {
+		//calculate the row once
+		firstRow = (row -1) * m;
+		secondRow = row * m;
+		thirdRow = (row + 1) * m; // maybe multiply the first row and just add m - optional
+		for (column = 1; column < lastIndex; ++column) {
+			pixel pixel11 = workingCopy[firstRow];
+			pixel pixel12 = workingCopy[firstRow + 1];
+			pixel pixel13 = workingCopy[firstRow + 2];
+			pixel pixel21 = workingCopy[secondRow];
+			pixel pixel22 = workingCopy[secondRow + 1];
+			pixel pixel23 = workingCopy[secondRow + 2];
+			pixel pixel31 = workingCopy[thirdRow];
+			pixel pixel32 = workingCopy[thirdRow + 1];
+			pixel pixel33 = workingCopy[thirdRow + 2];
+			
+
+			//calcualte the border's pixels values
+			borders.red = INT(pixel11.red) + INT(pixel12.red) + INT(pixel13.red) + INT(pixel21.red) +
+			INT(pixel23.red) + INT(pixel31.red) + INT(pixel32.red) + INT(pixel33.red);
+
+			borders.green = INT(pixel11.green) + INT(pixel12.green) + INT(pixel13.green) + INT(pixel21.green) +
+			INT(pixel23.green) + INT(pixel31.green) + INT(pixel32.green) + INT(pixel33.green);
+
+			borders.blue = INT(pixel11.blue) + INT(pixel12.blue) + INT(pixel13.blue) + INT(pixel21.blue) +
+			INT(pixel23.blue) + INT(pixel31.blue) + INT(pixel32.blue) + INT(pixel33.blue);
+			
+			//calculate the center piece
+			centerPixel.red = pixel22.red + (pixel22.red << 3);
+			centerPixel.green = pixel22.green + (pixel22.green << 3);
+			centerPixel.blue = pixel22.blue + (pixel22.blue << 3);
+
+			// asssign the maximum value
+			currentPixel.red = (unsigned char) MIN(MAX(centerPixel.red - borders.red, MIN_COLOR_VALUE), MAX_COLOR_VALUE);
+			currentPixel.green = (unsigned char) MIN(MAX(centerPixel.green - borders.green, MIN_COLOR_VALUE), MAX_COLOR_VALUE);
+			currentPixel.blue = (unsigned char) MIN(MAX(centerPixel.red - borders.red, MIN_COLOR_VALUE), MAX_COLOR_VALUE);
+
+			originalImage[secondRow + 1] = currentPixel;
+		}
+	}
+	free(workingCopy);
+}
+
 void sharpen(Image *image) {
 	int imageSize = n * m; // globals - maybe changing them to locals will improve runtime?
 	int numberOfChars = imageSize + (imageSize << 1); // utilizing the much quicker shift operator
@@ -538,6 +720,7 @@ void sharpen(Image *image) {
 	}
 }
 
+
 void myfunction(Image *image, char* srcImgpName, char* blurRsltImgName, char* sharpRsltImgName, char* filteredBlurRsltImgName, char* filteredSharpRsltImgName, char flag) {
 
 	/*
@@ -562,7 +745,7 @@ void myfunction(Image *image, char* srcImgpName, char* blurRsltImgName, char* sh
 		writeBMP(image, srcImgpName, blurRsltImgName);	
 
 		// sharpen the resulting image
-		sharpen(image);
+		sharpenPixels(image);
 		
 		// write result image to file
 		writeBMP(image, srcImgpName, sharpRsltImgName);	
@@ -574,10 +757,9 @@ void myfunction(Image *image, char* srcImgpName, char* blurRsltImgName, char* sh
 		writeBMP(image, srcImgpName, filteredBlurRsltImgName);
 
 		// sharpen the resulting image
-		sharpen(image);
+		sharpenPixels(image);
 
 		// write result image to file
 		writeBMP(image, srcImgpName, filteredSharpRsltImgName);	
 	}
-
 }
