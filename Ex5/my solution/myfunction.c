@@ -1,8 +1,11 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#define MIN_COLOR_VALUE 0
+#define MAX_COLOR_VALUE 255
 #define MIN(a, b) (a > b ? b : a)
 #define MAX(a, b) (a > b ? a : b)
+#define DIV_BY9(val) ((val * 0xe38f) >> 19)
 
 typedef struct {
    unsigned char red;
@@ -42,8 +45,8 @@ static void assign_sum_to_pixel(pixel *current_pixel, pixel_sum sum, int kernelS
 	sum.blue = sum.blue / kernelScale;
 
 	// truncate each pixel's color values to match the range [0,255]
-	current_pixel->red = (unsigned char) (MIN(MAX(sum.red, 0), 255));
-	current_pixel->green = (unsigned char) (MIN(MAX(sum.green, 0), 255));
+	current_pixel->red = (unsigned char) (MIN(MAX(sum.red, MIN_COLOR_VALUE), MAX_COLOR_VALUE));
+	current_pixel->green = (unsigned char) (MIN(MAX(sum.green, MIN_COL), 255));
 	current_pixel->blue = (unsigned char) (MIN(MAX(sum.blue, 0), 255));
 	return;
 }
@@ -275,9 +278,9 @@ void blurWithNoFilter(Image *image) {
 			imageCopy[nextRow + prevBlue] + imageCopy[nextRow + currBlue] + imageCopy[nextRow + nextBlue];
 
 			//assign the values
-			workCopy[currRow + column] = (unsigned char) (sumRedsValue / 9);
-			workCopy[currRow + currGreen] = (unsigned char) (sumGreensValue / 9);
-			workCopy[currRow + currBlue] = (unsigned char) (sumBluesValue / 9);
+			workCopy[currRow + column] = (unsigned char) DIV_BY9(sumRedsValue);
+			workCopy[currRow + currGreen] = (unsigned char) DIV_BY9(sumGreensValue);
+			workCopy[currRow + currBlue] = (unsigned char) DIV_BY9(sumBluesValue);
 		}
 	}
 }
@@ -494,9 +497,9 @@ void sharpen(Image *image) {
 			// now we need to assign the calcualted value to the original image. First, since the kernelScale is 1 there is no
 			// need to divide the result, since number / 1 == number. Second, there is a chance the pixel calculated is lower the 0 or higer than 255
 			// so there is a need to check for that
-			workCopy[currRow + column] = (unsigned char) MIN(MAX(centerRedValue - borderRedsValue, 0), 255);
-			workCopy[currRow + currGreen] = (unsigned char) MIN(MAX(centerGreenValue - borderGreensValue, 0), 255);
-			workCopy[currRow + currBlue] = (unsigned char) MIN(MAX(centerBlueValue - borderBluesValue, 0), 255);
+			workCopy[currRow + column] = (unsigned char) MIN(MAX(centerRedValue - borderRedsValue, MIN_COLOR_VALUE), MAX_COLOR_VALUE);
+			workCopy[currRow + currGreen] = (unsigned char) MIN(MAX(centerGreenValue - borderGreensValue, MIN_COLOR_VALUE), MAX_COLOR_VALUE);
+			workCopy[currRow + currBlue] = (unsigned char) MIN(MAX(centerBlueValue - borderBluesValue, MIN_COLOR_VALUE), MAX_COLOR_VALUE);
 			/*
 			int redValueOfPixel, greenValueOfPixel, blueValueOfPixel;
 			if (centerRedValue - borderRedsValue > 0) {
