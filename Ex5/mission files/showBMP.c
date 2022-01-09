@@ -8,9 +8,9 @@
 
 //sudo apt-get install freeglut3-dev
 //http://www.cs.ucdavis.edu/~amenta/s04/image/files.html
-#include <GLUT/glut.h>    // Header File For The GLUT Library
-#include <OpenGL/gl.h>	// Header File For The OpenGL32 Library
-#include <OpenGL/glu.h>	// Header File For The GLu32 Library
+#include <GL/glut.h>    // Header File For The GLUT Library
+#include <GL/gl.h>	// Header File For The OpenGL32 Library
+#include <GL/glu.h>	// Header File For The GLu32 Library
 #include <stdio.h>      // Header file for standard file i/o.
 #include <stdlib.h>     // Header file for malloc/free.
 #include "readBMP.h"

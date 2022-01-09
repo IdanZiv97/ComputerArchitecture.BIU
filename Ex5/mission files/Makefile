@@ -1,4 +1,4 @@
-LDLIBS = -lm   -framework GLUT -framework OpenGL -framework Cocoa
+LDLIBS = -lm   -lglut -lGL -lGLU -lX11 -lXmu -lXi -L/usr/X11R6/lib
 
 showBMP: showBMP.o readBMP.o writeBMP.o
 	gcc -o showBMP readBMP.o writeBMP.o showBMP.o $(LDLIBS)

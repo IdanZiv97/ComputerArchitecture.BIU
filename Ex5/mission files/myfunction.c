@@ -243,3 +243,4 @@ void myfunction(Image *image, char* srcImgpName, char* blurRsltImgName, char* sh
 		writeBMP(image, srcImgpName, filteredSharpRsltImgName);	
 	}
 }
+
