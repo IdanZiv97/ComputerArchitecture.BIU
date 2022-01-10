@@ -59,6 +59,7 @@ void blurWithNoFilter(Image *image) {
 	 * also we need to eavluate each pixel
 	 * Note: pixelij is kernel[i][j]
 	 */
+	// pixel pixel11, pixel12, pixel13, pixel21, pixel22, pixel23, pixel31, pixel32, pixel33;
 	register int firstRow, secondRow, thirdRow; // pixel rows inside the kernel
 	int tempRow, tempCol;
 	for (row = 1; row < lastIndex; ++row) {
@@ -66,8 +67,9 @@ void blurWithNoFilter(Image *image) {
 		for (column = 1; column < lastIndex; ++column) {
 			tempCol = MAX(column - 1, 0); // for the first case when we start with M[1][1]
 			firstRow = tempRow * m + tempCol;
-			secondRow = (tempRow + 1) * m + tempCol; 
-			thirdRow = (tempRow + 2) * m + tempCol;
+			secondRow = firstRow + m; 
+			thirdRow = secondRow + m;
+			//pixelij is kernel[i][j]
 			pixel pixel11 = workingCopy[firstRow];
 			pixel pixel12 = workingCopy[firstRow + 1];
 			pixel pixel13 = workingCopy[firstRow + 2];
@@ -123,13 +125,13 @@ void blurWithFilter(Image *image) {
 	register int firstRow, secondRow, thirdRow; // pixel rows inside the kernel
 	int maxPixelIntensity = MIN_INTENSITY, minPixelIntensity = MAX_INTENSITY;
 	int tempRow, tempCol;
-	for (row = 0; row < lastIndex; ++row) {
+	for (row = 1; row < lastIndex; ++row) {
 		tempRow = MAX(row - 1, 0); //for the first case when we start with M[1][1]
-		for (column = 0; column < lastIndex; ++column) {
+		for (column = 1; column < lastIndex; ++column) {
 			tempCol = MAX(column - 1, 0);
 			firstRow = tempRow * m + tempCol;
-			secondRow = (tempRow + 1) * m + tempCol; 
-			thirdRow = (tempRow + 2) * m + tempCol;
+			secondRow = firstRow + m; 
+			thirdRow = secondRow + m;
 			pixel pixel11 = workingCopy[firstRow];
 			currentIntensity = calcSum(pixel11.red, pixel11.green, pixel11.blue);
 			if (currentIntensity <= minPixelIntensity) {
@@ -289,8 +291,8 @@ void sharpenPixels(Image *image) {
 			// calculate the rows once
 			tempCol = MAX(column - 1, 0);
 			firstRow = tempRow * m + tempCol;
-			secondRow = (tempRow + 1) * m + tempCol;
-			thirdRow = (tempRow + 2) * m + tempCol;
+			secondRow = firstRow + m;
+			thirdRow = secondRow + m;
 			pixel pixel11 = workingCopy[firstRow];
 			pixel pixel12 = workingCopy[firstRow + 1];
 			pixel pixel13 = workingCopy[firstRow + 2];
