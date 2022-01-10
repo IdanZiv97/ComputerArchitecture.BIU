@@ -330,21 +330,6 @@ void sharpenPixels(Image *image) {
 
 
 void myfunction(Image *image, char* srcImgpName, char* blurRsltImgName, char* sharpRsltImgName, char* filteredBlurRsltImgName, char* filteredSharpRsltImgName, char flag) {
-
-	/*
-	* [1, 1, 1]
-	* [1, 1, 1]
-	* [1, 1, 1]
-	*/
-	int blurKernel[3][3] = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
-
-	/*
-	* [-1, -1, -1]
-	* [-1, 9, -1]
-	* [-1, -1, -1]
-	*/
-	int sharpKernel[3][3] = {{-1,-1,-1},{-1,9,-1},{-1,-1,-1}};
-
 	if (flag == '1') {	
 		// blur image
 		blurWithNoFilter(image);
