@@ -123,9 +123,9 @@ void blurWithFilter(Image *image) {
 	register int firstRow, secondRow, thirdRow; // pixel rows inside the kernel
 	int maxPixelIntensity = MIN_INTENSITY, minPixelIntensity = MAX_INTENSITY;
 	int tempRow, tempCol;
-	for (row = 1; row < lastIndex; ++row) {
-		tempRow = MAX(row -1, 0); //for the first case when we start with M[1][1]
-		for (column = 1; column < lastIndex; ++column) {
+	for (row = 0; row < lastIndex; ++row) {
+		tempRow = MAX(row - 1, 0); //for the first case when we start with M[1][1]
+		for (column = 0; column < lastIndex; ++column) {
 			tempCol = MAX(column - 1, 0);
 			firstRow = tempRow * m + tempCol;
 			secondRow = (tempRow + 1) * m + tempCol; 
@@ -218,7 +218,7 @@ void blurWithFilter(Image *image) {
 			}
 			if (currentIntensity > maxPixelIntensity) {
 				maxPixelIntensity = currentIntensity;
-				maxPixel = pixel11;
+				maxPixel = pixel33;
 			}
 			
 			valuesSum.red = INT(pixel11.red) + INT(pixel12.red) + INT(pixel13.red) + INT(pixel21.red) + INT(pixel22.red)
@@ -231,9 +231,12 @@ void blurWithFilter(Image *image) {
 			+ INT(pixel23.blue) + INT(pixel31.blue) + INT(pixel32.blue) + INT(pixel33.blue);
 
 			// also remove the min and max pixels' values
-			valuesSum.red -= (INT(maxPixel.red) + INT(minPixel.red));
-			valuesSum.green -= (INT(maxPixel.green) + INT(minPixel.green));
-			valuesSum.blue -= (INT(maxPixel.blue) + INT(minPixel.blue));
+			valuesSum.red = valuesSum.red - INT(minPixel.red);
+			valuesSum.red = valuesSum.red - INT(maxPixel.red);
+			valuesSum.green = valuesSum.green - INT(minPixel.green);
+			valuesSum.green = valuesSum.green - INT(maxPixel.green);
+			valuesSum.blue = valuesSum.blue - INT(minPixel.blue);
+			valuesSum.blue = valuesSum.blue - INT(maxPixel.blue);
 
 			//divide by 7
 			valuesSum.red = (valuesSum.red / 7);
@@ -280,9 +283,9 @@ void sharpenPixels(Image *image) {
 	pixel_sum valuesSum;
 	register int firstRow, secondRow, thirdRow;
 	int tempRow, tempCol;
-	for (row = 0; row < lastIndex; ++row) {
+	for (row = 1; row < lastIndex; ++row) {
 		tempRow = MAX(row - 1, 0); //for the first case when we start from M[1][1]
-		for (column = 0; column < lastIndex; ++column) {
+		for (column = 1; column < lastIndex; ++column) {
 			// calculate the rows once
 			tempCol = MAX(column - 1, 0);
 			firstRow = tempRow * m + tempCol;
