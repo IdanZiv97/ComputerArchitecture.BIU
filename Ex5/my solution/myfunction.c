@@ -275,7 +275,7 @@ void blurWithFilter(Image *image) {
 void sharpenPixels(Image *image) {
 	int imageSize = m * n;
 	int numOfPixels = imageSize + (imageSize << 1);
-	register pixel *originalImage = image->data;
+	register pixel *originalImage = (pixel*) image->data;
 	register pixel *workingCopy = malloc(numOfPixels);
 	memcpy(workingCopy, originalImage, numOfPixels);
 	register int row, column, lastIndex = m - 1;
