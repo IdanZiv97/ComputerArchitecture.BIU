@@ -47,13 +47,12 @@ typedef struct {
 void blurWithNoFilter(Image *image) {
 	int imageSize = m * n;
 	int numOfPixels = imageSize + (imageSize << 1); // faster way to multiply by 3
-	register pixel *originalImage = (pixel *) image->data; //this way we refference 3 chars in one refernce instead of 1
+	register pixel *currentPixel = (pixel *) image->data; //this way we refference 3 chars in one refernce instead of 1
 	register pixel *workingCopy = (pixel *) malloc(numOfPixels);
-	memcpy(workingCopy, originalImage, numOfPixels);
+	memcpy(workingCopy, currentPixel, numOfPixels);
 	pixel_sum valuesSum;
-	pixel currentPixel;
 	//copy the image
-	memcpy(workingCopy, originalImage, numOfPixels);
+	memcpy(workingCopy, currentPixel, numOfPixels);
 	register int row, column, lastIndex;
 	lastIndex = m - 1; //the last index we can perfom applyKernel to, we know that m == n
 	/**
@@ -61,40 +60,37 @@ void blurWithNoFilter(Image *image) {
 	 * also we need to eavluate each pixel
 	 * Note: pixelij is kernel[i][j]
 	 */
-	register int firstRow, secondRow, thirdRow; // pixel rows inside the kernel
-	int tempRow, tempCol;
+	// we save row calculating by pointing to the first element of each row
+	register pixel *firstRow, *secondRow, *thirdRow;
+	firstRow = &workingCopy[0];
+	secondRow = &workingCopy[m];
+	thirdRow = &workingCopy[m << 1];
+	currentPixel += (m + 1);
 	for (row = 1; row < lastIndex; ++row) {
-		tempRow = MAX(row - 1, 0);
 		for (column = 1; column < lastIndex; ++column) {
-			tempCol = MAX(column - 1, 0); // for the first case when we start with M[1][1]
-			firstRow = tempRow * m + tempCol;
-			secondRow = firstRow + m; 
-			thirdRow = secondRow + m;
-			//pixelij is kernel[i][j]
-			pixel pixel11 = workingCopy[firstRow];
-			pixel pixel12 = workingCopy[firstRow + 1];
-			pixel pixel13 = workingCopy[firstRow + 2];
-			pixel pixel21 = workingCopy[secondRow];
-			pixel pixel22 = workingCopy[secondRow + 1];
-			pixel pixel23 = workingCopy[secondRow + 2];
-			pixel pixel31 = workingCopy[thirdRow];
-			pixel pixel32 = workingCopy[thirdRow + 1];
-			pixel pixel33 = workingCopy[thirdRow + 2];
+			valuesSum.red = INT(firstRow->red) + INT(firstRow[1].red) + INT(firstRow[2].red) + INT(secondRow->red) + INT(secondRow[1].red)
+			+ INT(secondRow[2].red) + INT(thirdRow->red) + INT(thirdRow[1].red) + INT(thirdRow[2].red);
 
-			valuesSum.red = INT(pixel11.red) + INT(pixel12.red) + INT(pixel13.red) + INT(pixel21.red) + INT(pixel22.red)
-			+ INT(pixel23.red) + INT(pixel31.red) + INT(pixel32.red) + INT(pixel33.red);
+			valuesSum.green = INT(firstRow->green) + INT(firstRow[1].green) + INT(firstRow[2].green) + INT(secondRow->green) + INT(secondRow[1].green)
+			+ INT(secondRow[2].green) + INT(thirdRow->green) + INT(thirdRow[1].green) + INT(thirdRow[2].green);
 
-			valuesSum.green = INT(pixel11.green) + INT(pixel12.green) + INT(pixel13.green) + INT(pixel21.green) + INT(pixel22.green)
-			+ INT(pixel23.green) + INT(pixel31.green) + INT(pixel32.green) + INT(pixel33.green);
+			valuesSum.blue = INT(firstRow->blue) + INT(firstRow[1].blue) + INT(firstRow[2].blue) + INT(secondRow->blue) + INT(secondRow[1].blue)
+			+ INT(secondRow[2].blue) + INT(thirdRow->blue) + INT(thirdRow[1].blue) + INT(thirdRow[2].blue);
 
-			valuesSum.blue = INT(pixel11.blue) + INT(pixel12.blue) + INT(pixel13.blue) + INT(pixel21.blue) + INT(pixel22.blue)
-			+ INT(pixel23.blue) + INT(pixel31.blue) + INT(pixel32.blue) + INT(pixel33.blue);
+			//advance to the next pixel in the rows
+			++firstRow, ++secondRow,++thirdRow;
 
-			currentPixel.red = (unsigned char) DIV_BY9(valuesSum.red);
-			currentPixel.green = (unsigned char) DIV_BY9(valuesSum.green);
-			currentPixel.blue = (unsigned char) DIV_BY9(valuesSum.blue);
-			originalImage[row * m + column] = currentPixel;
+			(*currentPixel).red = (unsigned char) DIV_BY9(valuesSum.red);
+			(*currentPixel).green = (unsigned char) DIV_BY9(valuesSum.green);
+			(*currentPixel).blue = (unsigned char) DIV_BY9(valuesSum.blue);
+			++currentPixel;
 		}
+		// we end the loop in the last cell of the loop, so we need to skips to the 2nd pixel in the next row
+		// since the data is stored in 1d array we need to advance two more steps
+		firstRow += 2;
+		secondRow += 2;
+		thirdRow += 2;
+		currentPixel += 2;
 	}
 }
 
@@ -273,57 +269,56 @@ void blurWithFilter(Image *image) {
  */
 void sharpenPixels(Image *image) {
 	int imageSize = m * n;
-	int numOfPixels = imageSize + (imageSize << 1);
-	register pixel *originalImage = (pixel*) image->data;
-	register pixel *workingCopy = malloc(numOfPixels);
-	memcpy(workingCopy, originalImage, numOfPixels);
-	register int row, column, lastIndex = m - 1;
-	pixel currentPixel;
-	pixel_sum borders;
-	pixel_sum centerPixel;
+	int numOfPixels = imageSize + (imageSize << 1); // faster way to multiply by 3
+	register pixel *currentPixel = (pixel *) image->data; //this way we refference 3 chars in one refernce instead of 1
+	register pixel *workingCopy = (pixel *) malloc(numOfPixels);
+	memcpy(workingCopy, currentPixel, numOfPixels);
 	pixel_sum valuesSum;
-	register int firstRow, secondRow, thirdRow;
-	int tempRow, tempCol;
+	//copy the image
+	memcpy(workingCopy, currentPixel, numOfPixels);
+	register int row, column, lastIndex;
+	lastIndex = m - 1; //the last index we can perfom applyKernel to, we know that m == n
+	/**
+	 * We will go over each pixel and created its convulation, we can calulate all the pixels in the square
+	 * also we need to eavluate each pixel
+	 * Note: pixelij is kernel[i][j]
+	 */
+	// we save row calculating by pointing to the first element of each row
+	register pixel *firstRow, *secondRow, *thirdRow;
+	firstRow = &workingCopy[0];
+	secondRow = &workingCopy[m];
+	thirdRow = &workingCopy[m << 1];
+	currentPixel += (m + 1);
 	for (row = 1; row < lastIndex; ++row) {
-		tempRow = MAX(row - 1, 0); //for the first case when we start from M[1][1]
 		for (column = 1; column < lastIndex; ++column) {
-			// calculate the rows once
-			tempCol = MAX(column - 1, 0);
-			firstRow = tempRow * m + tempCol;
-			secondRow = firstRow + m;
-			thirdRow = secondRow + m;
-			pixel pixel11 = workingCopy[firstRow];
-			pixel pixel12 = workingCopy[firstRow + 1];
-			pixel pixel13 = workingCopy[firstRow + 2];
-			pixel pixel21 = workingCopy[secondRow];
-			pixel pixel22 = workingCopy[secondRow + 1];
-			pixel pixel23 = workingCopy[secondRow + 2];
-			pixel pixel31 = workingCopy[thirdRow];
-			pixel pixel32 = workingCopy[thirdRow + 1];
-			pixel pixel33 = workingCopy[thirdRow + 2];
-			//calcualte the border's pixels values
-			borders.red = INT(pixel11.red) + INT(pixel12.red) + INT(pixel13.red) + INT(pixel21.red) +
-			INT(pixel23.red) + INT(pixel31.red) + INT(pixel32.red) + INT(pixel33.red);
+			valuesSum.red = (INT(secondRow[1].red) + (INT(secondRow[1].red) << 3)) - INT(firstRow->red) - INT(firstRow[1].red) -
+			INT(firstRow[2].red) - INT(secondRow->red) - INT(secondRow[2].red) - INT(thirdRow->red)  -
+			INT(thirdRow[1].red) - INT(thirdRow[2].red);
 
-			borders.green = INT(pixel11.green) + INT(pixel12.green) + INT(pixel13.green) + INT(pixel21.green) +
-			INT(pixel23.green) + INT(pixel31.green) + INT(pixel32.green) + INT(pixel33.green);
+			valuesSum.green = (INT(secondRow[1].green) + (INT(secondRow[1].green) << 3)) - INT(firstRow->green) - INT(firstRow[1].green) -
+			INT(firstRow[2].green) - INT(secondRow->green) - INT(secondRow[2].green) - INT(thirdRow->green)  -
+			INT(thirdRow[1].green) - INT(thirdRow[2].green);
 
-			borders.blue = INT(pixel11.blue) + INT(pixel12.blue) + INT(pixel13.blue) + INT(pixel21.blue) +
-			INT(pixel23.blue) + INT(pixel31.blue) + INT(pixel32.blue) + INT(pixel33.blue);
-			
-			//calculate the center piece
-			centerPixel.red = pixel22.red + (pixel22.red << 3); // faster way to multiply by 9
-			centerPixel.green = pixel22.green + (pixel22.green << 3);
-			centerPixel.blue = pixel22.blue + (pixel22.blue << 3);
+			valuesSum.blue = (INT(secondRow[1].blue) + (INT(secondRow[1].blue) << 3)) - INT(firstRow->blue) - INT(firstRow[1].blue) -
+			INT(firstRow[2].blue) - INT(secondRow->blue) - INT(secondRow[2].blue) - INT(thirdRow->blue)  -
+			INT(thirdRow[1].blue) - INT(thirdRow[2].blue);
 
-			// asssign the maximum value
-			currentPixel.red = (unsigned char) MIN(MAX(centerPixel.red - borders.red, MIN_COLOR_VALUE), MAX_COLOR_VALUE);
-			currentPixel.green = (unsigned char) MIN(MAX(centerPixel.green - borders.green, MIN_COLOR_VALUE), MAX_COLOR_VALUE);
-			currentPixel.blue = (unsigned char) MIN(MAX(centerPixel.blue - borders.blue, MIN_COLOR_VALUE), MAX_COLOR_VALUE);
+			//advance to the next pixel in the rows
+			++firstRow, ++secondRow,++thirdRow;
 
-			originalImage[row * m + column] = currentPixel;
+			(*currentPixel).red = (unsigned char) MIN(MAX(valuesSum.red, MIN_COLOR_VALUE), MAX_COLOR_VALUE);
+			(*currentPixel).green = (unsigned char) MIN(MAX(valuesSum.green, MIN_COLOR_VALUE), MAX_COLOR_VALUE);
+			(*currentPixel).blue = (unsigned char) MIN(MAX(valuesSum.blue, MIN_COLOR_VALUE), MAX_COLOR_VALUE);
+			++currentPixel;
 		}
+		// we end the loop in the last cell of the loop, so we need to skips to the 2nd pixel in the next row
+		// since the data is stored in 1d array we need to advance two more steps
+		firstRow += 2;
+		secondRow += 2;
+		thirdRow += 2;
+		currentPixel += 2;
 	}
+
 	free(workingCopy);
 }
 
