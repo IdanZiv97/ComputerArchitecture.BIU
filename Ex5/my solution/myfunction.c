@@ -1,15 +1,17 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+//Constant Values
 #define MIN_COLOR_VALUE 0
 #define MAX_COLOR_VALUE 255
 #define MIN_INTENSITY -1
 #define MAX_INTENSITY 766
+//Inline functions
 #define MIN(a, b) (a > b ? b : a)
 #define MAX(a, b) (a > b ? a : b)
+// utlizing division by using shifts and additions
 #define DIV_BY9(val) ((val * 0xe38f) >> 19)
-// (((val * 0x2493) >> 16) + val) >> 3
-#define DIV_BY7(val) ((((val * 0x2493) >> 16) + val) >> 3)
+//macros to create a more readable code
 #define INT(val) ((int) val)
 #define calcSum(a, b, c) (((int) a) + ((int) b) + ((int) c))
 
@@ -27,16 +29,16 @@ typedef struct {
 } pixel_sum;
 
 /**
- * We will create a function to blur the image when the no filter option is on.
- * The idea is to realte to the image as a  continuous stream of data instead as an array
+ * We will create a function to blur the image when the filter option is off.
+ * The idea is to relate to the image as a  continuous stream of data instead as an array - saves time on copying the data.
  * Each line consist of m pixels and each pixel is the size of 3 chars
  * The size of the image is m*m pixels -> times 3 chars per pixel we get 3 * (m*n)
  * 
  * Since we always reference the working block (with the size of the kernel matrix) there is no need to check with the indexes or
- * calculating hte right index of the row. We spared a lot of min and max calls.
+ * calculating the right index of the row. We spared a lot of min and max calls.
  * 
- * Note: in blue all the cells are 1 so we can sum all the cells.
- * This time the kernelSize is 9 so each color value should be divided by 
+ * Note: in blur all the cells wheight is 1 so we can sum all the cells.
+ * This time the kernelSize is 9 so each color value should be divided by 9
  * Since all the kernel entries are 1 the value of each sum will never be negative so there is no need to check if the value is greate than 0
  * The maximum value of a pixel's color is 255 and since we sum 9 of them and divide by 9 we get an average which will never be greater than
  * the maximum value of a pixel's color, 255. This way we save a lot of min and max calculations
@@ -55,11 +57,10 @@ void blurWithNoFilter(Image *image) {
 	register int row, column, lastIndex;
 	lastIndex = m - 1; //the last index we can perfom applyKernel to, we know that m == n
 	/**
-	 * We will go over each pixel and created it convulation, we can calulate all the pixels in the square
+	 * We will go over each pixel and created its convulation, we can calulate all the pixels in the square
 	 * also we need to eavluate each pixel
 	 * Note: pixelij is kernel[i][j]
 	 */
-	// pixel pixel11, pixel12, pixel13, pixel21, pixel22, pixel23, pixel31, pixel32, pixel33;
 	register int firstRow, secondRow, thirdRow; // pixel rows inside the kernel
 	int tempRow, tempCol;
 	for (row = 1; row < lastIndex; ++row) {
@@ -99,10 +100,8 @@ void blurWithNoFilter(Image *image) {
 
 
 /**
- * We will spare the unnecessary copy and casting of chars and pixels by utilizing the fact that the image data is already stored
- * using a pointer to a countinuos data sequnce, using unsigned char*. We will reference the data as pixel* this way we can reach 
- * all the data in one memory upload.
- * We can set commonly used variables to a register this way we assure fast handling and access to them.
+ * The major difference in blur with filter is the fact that we are required to compute the min and max pixels in each working block and subtract those from the
+ * values sum
  */
 
 void blurWithFilter(Image *image) {
@@ -313,7 +312,7 @@ void sharpenPixels(Image *image) {
 			INT(pixel23.blue) + INT(pixel31.blue) + INT(pixel32.blue) + INT(pixel33.blue);
 			
 			//calculate the center piece
-			centerPixel.red = pixel22.red + (pixel22.red << 3);
+			centerPixel.red = pixel22.red + (pixel22.red << 3); // faster way to multiply by 9
 			centerPixel.green = pixel22.green + (pixel22.green << 3);
 			centerPixel.blue = pixel22.blue + (pixel22.blue << 3);
 
